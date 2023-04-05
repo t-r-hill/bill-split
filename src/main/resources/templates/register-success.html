@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='home'">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="container">
+        <h3>Congratulations! You've successfully created your account</h3>
+        <button th:href="@{/login}" type="submit" class="btn btn-primary my-10">Login</button>
+    </div>
+</div>
+</body>
+</html>

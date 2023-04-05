@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='login'">
+<head>
+    <title>Register</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="row">
+        <div class="offset-4 col-8">
+            <h2>Create an account</h2>
+            <div class="alert alert-danger" th:if="${errorMessage != null}">
+                <p th:text="${errorMessage}">Error message</p>
+            </div>
+            <form class="form-horizontal" action="#" th:action="@{/register}" th:object="${user}" method="post">
+                <div class="form-group mb-3">
+                    <label class="control-label" for="fullName">Name</label>
+                    <div>
+                        <input class="form-control" type="text" id="fullName" th:field="*{fullName}" required/>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="control-label" for="email">Email</label>
+                    <div>
+                        <input class="form-control" type="email" id="email" th:field="*{username}" required/>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="control-label" for="password">Password</label>
+                    <div>
+                        <input class="form-control" type="password" id="password" th:field="*{password}" required/>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

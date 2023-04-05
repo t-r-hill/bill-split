@@ -1,0 +1,16 @@
+/* Remove the navbar's default margin-bottom and rounded borders */
+.navbar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-radius: 0;
+    background-color: #103463;
+}
+
+/* Set black background color, white text and some padding */
+footer {
+  background-color: #555;
+  color: white;
+  padding: 15px;
+  margin-top: 15px;
+}
