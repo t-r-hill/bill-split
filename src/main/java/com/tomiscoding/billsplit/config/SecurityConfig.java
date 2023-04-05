@@ -16,9 +16,9 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/", "/webjars/**", "/css/**", "/login", "/images/**", "/register").permitAll()
+                        .antMatchers("/", "/webjars/**", "/css/**", "/login", "/img/**", "/register").permitAll()
                         .anyRequest().hasAuthority("ROLE_USER"))
-                .formLogin(login -> login.loginPage("login").defaultSuccessUrl("/").failureUrl("/login?error").permitAll());
+                .formLogin(login -> login.loginPage("login").defaultSuccessUrl("/").permitAll());
         return http.build();
     }
 

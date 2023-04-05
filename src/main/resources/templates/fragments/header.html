@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">>
+<head>
+</head>
+<body>
+<th:block th:fragment="header">
+  <nav class="navbar navbar-expand navbar-inverse navbar-static-top">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/}">
+        <img th:src="@{/img/logo.png}" alt="crown macks"/>
+        Shopping
+      </a>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="nav-item">
+            <a th:class="${activeTab == 'home'} ? 'nav-link active' : 'nav-link'" th:href="@{/}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a th:class="${activeTab == 'cart'} ? 'nav-link active' : 'nav-link'" th:href="@{/cart}">Cart</a>
+          </li>
+          <li class="nav-item">
+            <a th:class="${activeTab == 'items'} ? 'nav-link active' : 'nav-link'" th:href="@{/items}">Items</a>
+          </li>
+        </ul>
+        <div sec:authorize="isAuthenticated()">
+          <form method="post" th:action="@{/logout}">
+            <input type="submit" class="btn btn-danger btn-small navbar-btn" value="Logout"/>
+          </form>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+          <span class="navbar-text" sec:authentication="name"></span>
+          <span class="navbar-text" sec:authentication="principal.authorities"></span>
+        </div>
+        <ul sec:authorize="hasRole('ANONYMOUS')" class="nav navbar-nav navbar-right">
+          <li class="nav-item">
+            <a th:href="@{/login}" class="btn btn-primary btn-small navbar-btn">Login</a>
+          </li>
+          <li class="nav-item">
+            <a th:href="@{/register}" class="btn btn-primary btn-small navbar-btn">Register</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</th:block>
