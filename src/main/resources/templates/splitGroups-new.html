@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='splitGroups'">
+<head>
+  <title>Add Group</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+  <div class="row">
+    <div class="offset-3 col-6">
+      <h3>Create a group</h3>
+    <form class="form-horizontal" action="#" th:action="@{/splitGroup}" th:object="${splitGroup}" method="post">
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="name">Name</label>
+        <div class="col-10">
+          <input class="form-control" type="text" id="name" th:field="*{groupName}" required/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="description">Description</label>
+        <div class="col-10">
+          <input class="form-control" type="text" id="description" th:field="*{groupDescription}"/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="currency">Currency</label>
+        <div class="col-10">
+          <select class="form-control" id="currency" th:field="*{baseCurrency}">
+            <option th:each="currency:${currencies}" th:value="${currency}" th:text="${currency}">Currency</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <div class="offset-2">
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

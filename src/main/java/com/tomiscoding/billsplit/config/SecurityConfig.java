@@ -18,7 +18,10 @@ public class SecurityConfig{
                 .authorizeRequests(auth -> auth
                         .antMatchers("/", "/webjars/**", "/fragments/**", "/css/**", "/login", "/img/**", "/register").permitAll()
                         .anyRequest().hasAuthority("ROLE_USER"))
-                .formLogin(login -> login.loginPage("/login").defaultSuccessUrl("/").permitAll());
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .permitAll());
         return http.build();
     }
 
