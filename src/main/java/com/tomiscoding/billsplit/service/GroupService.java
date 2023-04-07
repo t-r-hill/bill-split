@@ -53,6 +53,20 @@ public class GroupService {
         );
     }
 
+    public void addUserToGroupByInviteCode(User user, String inviteCode) throws SplitGroupNotFoundException, ValidationException {
+        SplitGroup splitGroup = groupRepository.findByInviteCode(inviteCode).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with invite code: " + inviteCode)
+        );
+
+        GroupMember groupMember = GroupMember.builder()
+                .user(user)
+                .splitGroup(splitGroup)
+                .isAdmin(false)
+                .build();
+
+        groupMemberService.createGroupMember(groupMember);
+    }
+
     public List<SplitGroup> getGroupsByUser(User user){
         return groupRepository.getByGroupMembers_User(user);
     }

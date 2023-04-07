@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.controller;
 
+import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.GroupService;
@@ -11,6 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Comparator;
 
 @Controller
 public class UserController {
@@ -45,6 +51,24 @@ public class UserController {
             model.addAttribute("errorMessage", e.getMessage());
             return "register";
         }
+    }
+
+    @GetMapping("/overview")
+    public String showOverviewPage(Authentication authentication, HttpServletRequest request) throws ValidationException, SplitGroupNotFoundException {
+        Cookie[] cookies = request.getCookies();
+        String inviteCode = "";
+        if (cookies != null){
+            inviteCode = Arrays.stream(cookies)
+                    .filter(c -> c.getName().equals("inviteCode"))
+                    .min(Comparator.comparingInt(Cookie::getMaxAge))
+                    .orElse(new Cookie("inviteCode", ""))
+                    .getValue();
+        }
+        if (!inviteCode.isBlank()){
+            User user = (User) authentication.getPrincipal();
+            groupService.addUserToGroupByInviteCode(user, inviteCode);
+        }
+        return "overview";
     }
 
     @GetMapping("/")

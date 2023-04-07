@@ -16,11 +16,11 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/", "/webjars/**", "/fragments/**", "/css/**", "/login", "/img/**", "/register").permitAll()
+                        .antMatchers("/", "/webjars/**", "/fragments/**", "/css/**", "/login", "/img/**", "/register", "/splitGroup/join/**").permitAll()
                         .anyRequest().hasAuthority("ROLE_USER"))
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/overview")
                         .permitAll());
         return http.build();
     }

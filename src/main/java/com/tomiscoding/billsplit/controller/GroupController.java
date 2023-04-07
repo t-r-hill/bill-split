@@ -11,14 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
+@RequestMapping("/splitGroup")
 public class GroupController {
 
     @Autowired
@@ -27,7 +27,7 @@ public class GroupController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/splitGroup")
+    @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
         User user = (User) authentication.getPrincipal();
         List<SplitGroup> splitGroups = groupService.getGroupsByUser(user);
@@ -35,7 +35,7 @@ public class GroupController {
         return "splitGroups";
     }
 
-    @GetMapping("/splitGroup/{id}")
+    @GetMapping("/{id}")
     public String showGroupWithUsersAndExpenses(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
         List<User> users = userService.getUsersBySplitGroup(splitGroup);
@@ -44,7 +44,7 @@ public class GroupController {
         return "splitGroup";
     }
 
-    @GetMapping("/splitGroup/new")
+    @GetMapping("/new")
     public String showCreateGroupPage(Model model){
         SplitGroup splitGroup = new SplitGroup();
         List<Currency> currencies = List.of(Currency.values());
@@ -53,17 +53,26 @@ public class GroupController {
         return "splitGroups-new";
     }
 
-    @GetMapping("/splitGroup/{id}/user/new")
+    @GetMapping("/{id}/user/new")
     public String showAddGroupMemberPage(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
         model.addAttribute("splitGroup", splitGroup);
         return "add-group-member";
     }
 
-    @PostMapping("/splitGroup")
+    @PostMapping
     public String createGroup(@ModelAttribute SplitGroup splitGroup, Authentication authentication) throws ValidationException {
         User user = (User) authentication.getPrincipal();
         groupService.createGroup(splitGroup, user);
         return "redirect:/splitGroup";
+    }
+
+    @GetMapping("/join/{inviteCode}")
+    public String collectInviteLink(@PathVariable String inviteCode, HttpServletResponse response){
+        Cookie cookie = new Cookie("inviteCode", inviteCode);
+        cookie.setMaxAge(600);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        return "redirect:/overview";
     }
 }
