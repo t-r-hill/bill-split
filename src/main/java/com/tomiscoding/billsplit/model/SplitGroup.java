@@ -33,7 +33,7 @@ public class SplitGroup {
     @OneToMany(mappedBy = "splitGroup", cascade = CascadeType.ALL)
     private List<GroupMember> groupMembers;
 
-//    @OneToMany(mappedBy = "group")
+    //    @OneToMany(mappedBy = "group")
 //    private List<Expense> expense = new ArrayList<>();
 
 }

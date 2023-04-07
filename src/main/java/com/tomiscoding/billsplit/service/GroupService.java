@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.GroupMember;
@@ -44,6 +45,12 @@ public class GroupService {
         splitGroup.setGroupMembers(Collections.singletonList(groupMember));
 
         return groupRepository.save(splitGroup);
+    }
+
+    public SplitGroup getGroupById(Long id) throws SplitGroupNotFoundException {
+        return groupRepository.findById(id).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
+        );
     }
 
     public List<SplitGroup> getGroupsByUser(User user){

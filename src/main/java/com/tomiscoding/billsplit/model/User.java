@@ -36,6 +36,9 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "authority_id"))
     private List<Authority> authorities;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<GroupMember> groupMembers;
+
     @Column(nullable = false)
     private boolean isEnabled = true;
 

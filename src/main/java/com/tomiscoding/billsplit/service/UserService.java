@@ -2,6 +2,7 @@ package com.tomiscoding.billsplit.service;
 
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Authority;
+import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.AuthorityRepository;
 import com.tomiscoding.billsplit.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 /** This is a service class for the user object which implements the loadByUsername() method
  *  as well as providing other functionality for registration, login and updating of user profiles
@@ -49,6 +51,10 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
 
+    }
+
+    public List<User> getUsersBySplitGroup(SplitGroup splitGroup){
+        return userRepository.getByGroupMembers_SplitGroup(splitGroup);
     }
 
     // Helper function to prevent accounts with duplicate usernames

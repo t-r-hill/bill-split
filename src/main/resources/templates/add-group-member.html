@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='splitGroups'">
+<head>
+    <title th:text="${splitGroup.groupName}">Group name</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="row mb-2">
+        <div class="col-10">
+            <h3 th:text="'Add a group member to ' + ${splitGroup.groupName}">Your group</h3>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-4">
+            <p>Send this link to invite someone to join: </p>
+        </div>
+        <div class="col-8">
+            <p><a th:href="@{/join/{inviteCode}(inviteCode=${splitGroup.inviteCode})}">Invite link</a></p>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <p>Or enter their email address below and we'll send them an invite link to their inbox</p>
+    </div>
+    <!-- Send email -->
+    <div class="row">
+        <form class="form-horizontal row" action="#" th:action="@{/invite}" method="post">
+            <label class="control-label col-form-label col-auto" for="email">Email</label>
+            <div class="col-auto">
+                <input class="form-control" type="text" id="email" th:name="email" required/>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
