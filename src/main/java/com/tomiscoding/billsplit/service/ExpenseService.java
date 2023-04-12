@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -21,7 +22,7 @@ public class ExpenseService {
 
     public Expense saveExpense(Expense expense) throws ValidationException {
         validateExpense(expense);
-        expense.setAmount(expense.getAmount().setScale(2, MathContext.DECIMAL64.getRoundingMode()));
+        expense.setAmount(expense.getAmount().setScale(2, RoundingMode.HALF_EVEN));
         return expenseRepository.save(expense);
     }
 

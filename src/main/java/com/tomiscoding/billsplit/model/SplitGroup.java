@@ -3,6 +3,9 @@ package com.tomiscoding.billsplit.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,27 @@ public class SplitGroup {
     private List<GroupMember> groupMembers;
 
     @OneToMany(mappedBy = "splitGroup")
-    private List<Expense> expense = new ArrayList<>();
+    private List<Expense> expenses = new ArrayList<>();
+
+    @Transient
+    public BigDecimal getExpensesTotal(){
+        return expenses.stream()
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
+
+    @Transient
+    public BigDecimal getExpensesTotalByUserId(Long userId){
+        return expenses.stream()
+                .filter(e -> e.getUser().getId() == userId)
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transient
+    public BigDecimal getAmountOwedByUserId(Long userId, int numUsers){
+        return getExpensesTotal().divide(BigDecimal.valueOf(numUsers),2, RoundingMode.HALF_EVEN)
+                .subtract(getExpensesTotalByUserId(userId));
+    }
 
 }

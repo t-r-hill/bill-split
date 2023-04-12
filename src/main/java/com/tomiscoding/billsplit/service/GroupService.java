@@ -54,6 +54,13 @@ public class GroupService {
         );
     }
 
+    public SplitGroup getGroupWithExpensesById(Long id) throws SplitGroupNotFoundException {
+        return groupRepository.getSplitGroupWithExpensesById(id).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
+        );
+
+    }
+
     public void addUserToGroupByInviteCode(User user, String inviteCode) throws SplitGroupNotFoundException, ValidationException, DuplicateGroupMemberException {
         SplitGroup splitGroup = groupRepository.findByInviteCode(inviteCode).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with invite code: " + inviteCode)

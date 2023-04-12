@@ -13,29 +13,35 @@
         </div>
         <div class="col-auto">
             <div class="btn-group btn-group-md">
-                <a th:href="@{/splitGroup/{id}/user/new(id=${splitGroup.id})}" class="btn btn-primary btn-small">Add member</a>
-                <a class="btn btn-primary btn-small" th:href="@{/expense/new(splitGroupId=${splitGroup.id})}">Add expense</a>
+                <a th:href="@{/splitGroup/{id}/user/new(id=${splitGroup.id})}" class="btn btn-primary btn-small">Calculate payments</a>
             </div>
         </div>
     </div>
+    <div class="row">
+        <h5 th:text="${splitGroup.groupDescription}">Your group description</h5>
+    </div>
     <!-- Group summary table -->
-    <div class="row mb-20" align="center">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Currency</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td th:text="${splitGroup.groupName}" scope="col">Group name</td>
-                <td th:text="${splitGroup.groupDescription}" scope="col">Description</td>
-                <td th:text="${splitGroup.baseCurrency}" scope="col">Currency</td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="row mb-20 justify-content-center" >
+        <div class="col-auto">
+            <table class="table table-striped text-center">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Total Expenses</th>
+                    <th scope="col">Your Expenses</th>
+                    <th scope="col">Amount you owe</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${splitGroup.baseCurrency}">Group currency</td>
+                    <td th:text="${splitGroup.getExpensesTotal()}">Group name</td>
+                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Description</td>
+                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__)}">Amount owed</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="row justify-content-between">
         <div class="col">
@@ -63,7 +69,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="expense:${expenses}">
+            <tr th:each="expense:${splitGroup.expenses}">
                 <td th:text="${expense.user.fullName}" scope="col"></td>
                 <td th:text="${expense.expenseDate}" scope="col"></td>
                 <td th:text="${expense.name}" scope="col"></td>
