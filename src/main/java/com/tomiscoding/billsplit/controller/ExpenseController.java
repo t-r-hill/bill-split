@@ -51,8 +51,9 @@ public class ExpenseController {
 
     @GetMapping("/{id}/delete")
     public String deleteExpense(@PathVariable Long id) throws ValidationException, ExpenseNotFoundException {
+        long splitGroupId = expenseService.getExpense(id).getSplitGroup().getId();
         expenseService.deleteExpense(id);
-        return "redirect:/splitGroup";
+        return "redirect:/splitGroup/" + splitGroupId;
     }
 
     @PostMapping("/{id}")

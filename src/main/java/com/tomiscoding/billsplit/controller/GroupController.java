@@ -8,6 +8,7 @@ import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
+import com.tomiscoding.billsplit.service.PaymentService;
 import com.tomiscoding.billsplit.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,7 +31,7 @@ public class GroupController {
     UserService userService;
 
     @Autowired
-    ExpenseService expenseService;
+    PaymentService paymentService;
 
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
@@ -70,6 +71,13 @@ public class GroupController {
         User user = (User) authentication.getPrincipal();
         groupService.createGroup(splitGroup, user);
         return "redirect:/splitGroup";
+    }
+
+    @GetMapping("/{id}/calculate")
+    public String calculatePayments(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
+        SplitGroup splitGroup = groupService.getGroupById(id);
+        paymentService.calculateAndSavePayments(splitGroup);
+        return "redirect:/splitGroup/" + id;
     }
 
     @GetMapping("/join/{inviteCode}")

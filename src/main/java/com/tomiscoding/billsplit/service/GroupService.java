@@ -3,18 +3,15 @@ package com.tomiscoding.billsplit.service;
 import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
-import com.tomiscoding.billsplit.model.Payment;
-import com.tomiscoding.billsplit.model.SplitGroup;
-import com.tomiscoding.billsplit.model.GroupMember;
-import com.tomiscoding.billsplit.model.User;
+import com.tomiscoding.billsplit.model.*;
 import com.tomiscoding.billsplit.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -26,7 +23,7 @@ public class GroupService {
     GroupMemberService groupMemberService;
 
     @Autowired
-    ExpenseService expenseService;
+    UserService userService;
 
     @Transactional
     public SplitGroup createGroup(SplitGroup splitGroup, User user) throws ValidationException{
@@ -102,8 +99,4 @@ public class GroupService {
             throw new ValidationException("A base currency must be selected");
         }
     }
-
-//    private List<Payment> calculatePayments(SplitGroup splitGroup){
-//        List<Expense>
-//    }
 }
