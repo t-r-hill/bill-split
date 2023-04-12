@@ -3,6 +3,7 @@ package com.tomiscoding.billsplit.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,7 +34,7 @@ public class SplitGroup {
     @OneToMany(mappedBy = "splitGroup", cascade = CascadeType.ALL)
     private List<GroupMember> groupMembers;
 
-    //    @OneToMany(mappedBy = "group")
-//    private List<Expense> expense = new ArrayList<>();
+    @OneToMany(mappedBy = "splitGroup")
+    private List<Expense> expense = new ArrayList<>();
 
 }

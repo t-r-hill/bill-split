@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='expenses'">
+<head>
+  <title>Add expense</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+  <div class="row">
+    <div class="offset-3 col-6">
+      <h3>Add an expense</h3>
+    <form class="form-horizontal" action="#" th:action="@{/expense}" th:object="${expense}" method="post">
+      <input type="hidden" th:field="*{splitGroup}" th:value="${expense.splitGroup.id}"/>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="name">Name</label>
+        <div class="col-10">
+          <input class="form-control" type="text" id="name" th:field="*{name}" required/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="description">Description</label>
+        <div class="col-10">
+          <input class="form-control" type="text" id="description" th:field="*{expenseDescription}"/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="amount">Cost</label>
+        <div class="col-10">
+          <input class="form-control" type="number" min="0" id="amount" step="0.01" th:field="*{amount}" required/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="currency">Currency</label>
+        <div class="col-10">
+          <select class="form-control" id="currency" th:field="*{currency}">
+            <option th:each="currency:${currencies}" th:value="${currency}" th:text="${currency}">Currency</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <label class="control-label col-form-label col-2" for="date">Date</label>
+        <div class="col-10">
+          <input class="form-control" type="date" id="date" th:field="*{expenseDate}" required/>
+        </div>
+      </div>
+      <div class="form-group row mb-3">
+        <div class="offset-2">
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='splitGroups'">
+<head>
+    <title>Join group</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="row mb-2">
+        <div class="col">
+            <h3>Join a group</h3>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <p>Enter an invitation code in the box below</p>
+    </div>
+    <div class="row">
+        <form class="form-horizontal row" action="#" th:action="@{/splitGroup/join}" method="post">
+            <label class="control-label col-form-label col-auto" for="invite-code">Code</label>
+            <div class="col-auto">
+                <input class="form-control" type="text" id="invite-code" th:name="inviteCode" required/>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Join</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -51,6 +51,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean credentialsNonExpired = true;
 
+    @OneToMany(mappedBy = "user")
+    private List<Expense> expenses;
+
     // This constructor is used to create a (non-admin) user account
     // and populate with default properties
     public User(String username, String password, String fullName, List<Authority> authorities){

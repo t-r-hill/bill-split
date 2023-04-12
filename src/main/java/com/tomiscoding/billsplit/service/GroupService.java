@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.SplitGroup;
@@ -53,7 +54,7 @@ public class GroupService {
         );
     }
 
-    public void addUserToGroupByInviteCode(User user, String inviteCode) throws SplitGroupNotFoundException, ValidationException {
+    public void addUserToGroupByInviteCode(User user, String inviteCode) throws SplitGroupNotFoundException, ValidationException, DuplicateGroupMemberException {
         SplitGroup splitGroup = groupRepository.findByInviteCode(inviteCode).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with invite code: " + inviteCode)
         );

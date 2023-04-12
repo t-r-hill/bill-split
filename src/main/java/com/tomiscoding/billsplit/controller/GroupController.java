@@ -1,10 +1,13 @@
 package com.tomiscoding.billsplit.controller;
 
+import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Currency;
+import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
+import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ public class GroupController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ExpenseService expenseService;
+
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
         User user = (User) authentication.getPrincipal();
@@ -38,9 +44,11 @@ public class GroupController {
     @GetMapping("/{id}")
     public String showGroupWithUsersAndExpenses(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
+        List<Expense> expenses = expenseService.getExpenseByGroup(splitGroup);
         List<User> users = userService.getUsersBySplitGroup(splitGroup);
         model.addAttribute("splitGroup", splitGroup);
         model.addAttribute("users", users);
+        model.addAttribute("expenses", expenses);
         return "splitGroup";
     }
 
@@ -74,5 +82,23 @@ public class GroupController {
         cookie.setPath("/");
         response.addCookie(cookie);
         return "redirect:/overview";
+    }
+
+    @GetMapping("/join")
+    public String showJoinGroup(){
+        return "join-group";
+    }
+
+    @PostMapping("/join")
+    public String addUserToGroup(@RequestParam String inviteCode, Authentication authentication){
+        if (!inviteCode.isBlank()){
+            User user = (User) authentication.getPrincipal();
+            try {
+                groupService.addUserToGroupByInviteCode(user, inviteCode);
+            } catch (ValidationException | SplitGroupNotFoundException | DuplicateGroupMemberException e) {
+                // log exception here;
+            }
+        }
+        return "redirect:/splitGroup";
     }
 }

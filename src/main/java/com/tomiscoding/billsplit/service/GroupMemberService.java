@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.GroupMember;
 import com.tomiscoding.billsplit.repository.GroupMemberRepository;
@@ -12,8 +13,11 @@ public class GroupMemberService {
     @Autowired
     GroupMemberRepository groupMemberRepository;
 
-    public GroupMember createGroupMember(GroupMember groupMember) throws ValidationException {
+    public GroupMember createGroupMember(GroupMember groupMember) throws ValidationException, DuplicateGroupMemberException {
         validateGroupMember(groupMember);
+        if (groupMemberRepository.existsByUserAndSplitGroup(groupMember.getUser(), groupMember.getSplitGroup())){
+            throw new DuplicateGroupMemberException(groupMember.getUser().toString() + " is already a member of group: " + groupMember.getSplitGroup());
+        }
         return groupMemberRepository.save(groupMember);
     }
 

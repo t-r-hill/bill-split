@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.controller;
 
+import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.User;
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/overview")
-    public String showOverviewPage(Authentication authentication, HttpServletRequest request) throws ValidationException, SplitGroupNotFoundException {
+    public String showOverviewPage(Authentication authentication, HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String inviteCode = "";
         if (cookies != null){
@@ -66,7 +67,11 @@ public class UserController {
         }
         if (!inviteCode.isBlank()){
             User user = (User) authentication.getPrincipal();
-            groupService.addUserToGroupByInviteCode(user, inviteCode);
+            try {
+                groupService.addUserToGroupByInviteCode(user, inviteCode);
+            } catch (ValidationException | SplitGroupNotFoundException | DuplicateGroupMemberException e) {
+                // log exception here;
+            }
         }
         return "overview";
     }
