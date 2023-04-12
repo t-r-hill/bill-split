@@ -3,6 +3,7 @@ package com.tomiscoding.billsplit.service;
 import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
+import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.GroupMember;
 import com.tomiscoding.billsplit.model.User;
@@ -23,6 +24,9 @@ public class GroupService {
 
     @Autowired
     GroupMemberService groupMemberService;
+
+    @Autowired
+    ExpenseService expenseService;
 
     @Transactional
     public SplitGroup createGroup(SplitGroup splitGroup, User user) throws ValidationException{
@@ -98,4 +102,8 @@ public class GroupService {
             throw new ValidationException("A base currency must be selected");
         }
     }
+
+//    private List<Payment> calculatePayments(SplitGroup splitGroup){
+//        List<Expense>
+//    }
 }

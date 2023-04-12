@@ -29,7 +29,7 @@
                     <th scope="col"></th>
                     <th scope="col">Total Expenses</th>
                     <th scope="col">Your Expenses</th>
-                    <th scope="col">Amount you owe</th>
+                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__)} > 0 ? 'Amount you owe' : 'Amount owed to you'" scope="col">Amount you owe</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,7 +37,7 @@
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
                     <td th:text="${splitGroup.getExpensesTotal()}">Group name</td>
                     <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Description</td>
-                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__)}">Amount owed</td>
+                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__).abs()}">Amount owed</td>
                 </tr>
                 </tbody>
             </table>
