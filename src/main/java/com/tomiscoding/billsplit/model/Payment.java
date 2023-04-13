@@ -1,9 +1,11 @@
 package com.tomiscoding.billsplit.model;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -33,5 +35,11 @@ public class Payment {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private boolean isPaid;
+    @Enumerated(value = EnumType.STRING)
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.NOT_PAID;
+
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @Column(nullable = false)
+    private LocalDate calculatedDate;
 }

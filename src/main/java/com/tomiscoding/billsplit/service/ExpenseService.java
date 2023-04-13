@@ -53,6 +53,12 @@ public class ExpenseService {
         expenseRepository.delete(expense);
     }
 
+    public List<Expense> setExpensesAsSplitByGroup(SplitGroup splitGroup){
+        List<Expense> expenses = splitGroup.getExpenses();
+        expenses.forEach(e -> e.setSplit(true));
+        return expenseRepository.saveAll(expenses);
+    }
+
     public List<Expense> getExpenseByGroup(SplitGroup splitGroup){
         return expenseRepository.getExpenseBySplitGroup(splitGroup);
     }
@@ -60,7 +66,7 @@ public class ExpenseService {
     private void validateExpense(Expense expense) throws ValidationException {
         if (expense.getName() == null || expense.getName().isBlank()){
             throw new ValidationException("Name must not be blank");
-        } else if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) == -1){
+        } else if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) < 0){
             throw new ValidationException("Amount must be a positive value");
         } else if (expense.getAmount().scale() > 2){
             throw new ValidationException("Amount must have no more than two decimal places");

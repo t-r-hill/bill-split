@@ -21,27 +21,82 @@
         <h5 th:text="${splitGroup.groupDescription}">Your group description</h5>
     </div>
     <!-- Group summary table -->
-    <div class="row mb-20 justify-content-center" >
+    <div class="row mb-20 justify-content-evenly" >
         <div class="col-auto">
+            <h5 align="center">Current</h5>
             <table class="table table-striped text-center">
                 <thead>
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col">Total Expenses</th>
+                    <th scope="col">Group Expenses</th>
                     <th scope="col">Your Expenses</th>
-                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__)} > 0 ? 'Amount you owe' : 'Amount owed to you'" scope="col">Amount you owe</th>
+                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__)} > 0 ? 'Owed to you' : 'Due to you'" scope="col">Amount you owe</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
-                    <td th:text="${splitGroup.getExpensesTotal()}">Group name</td>
-                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Description</td>
-                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__,__${users.size()}__).abs()}">Amount owed</td>
+                    <td th:text="${splitGroup.getExpensesNotSplitTotal()}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesNotSplitTotalByUserId(__${#authentication.principal.id}__)}">Your expenses</td>
+                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).abs()}">Amount owed</td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        <div class="col-auto">
+            <h5 align="center">All Time</h5>
+            <table class="table table-striped text-center">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Group Expenses</th>
+                    <th scope="col">Your Expenses</th>
+                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__)} > 0 ? 'Paid to you' : 'Paid by you'" scope="col">Amount you owe</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${splitGroup.baseCurrency}">Group currency</td>
+                    <td th:text="${splitGroup.getExpensesTotal()}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Your expenses</td>
+                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).abs()}">Amount owed</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:if="${!payments.isEmpty()}" class="row justify-content-between">
+        <div class="col">
+            <h4>Payments</h4>
+        </div>
+    </div>
+    <!-- Group payments table - can this be collapsible-->
+    <div th:if="${!payments.isEmpty()}" class="row mb-20" align="center">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment:${payments}">
+                <td th:text="${payment.fromUser.fullName}" scope="col"></td>
+                <td th:text="${payment.toUser.fullName}" scope="col"></td>
+                <td th:text="${payment.amount}" scope="col"></td>
+                <td th:text="${payment.paymentStatus.getFieldDescription()}" scope="col"></td>
+                <td scope="col">
+                    <div class="btn-group btn-group-sm">
+                        <a th:if="${payment.paymentStatus.name == 'NOT_PAID'}" class="btn btn-secondary" th:href="@{/payment/{id}/(id=${payment.id},status='pending')}">Pay</a>
+                        <a th:if="${payment.paymentStatus.name == 'PAID_PENDING'}" class="btn btn-danger" th:href="@{/payment/{id}/(id=${payment.id},status='confirmed')}">Confirm payment</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="row justify-content-between">
         <div class="col">

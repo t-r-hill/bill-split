@@ -48,6 +48,14 @@ public class SplitGroup {
     }
 
     @Transient
+    public BigDecimal getExpensesNotSplitTotal(){
+        return expenses.stream()
+                .filter(e -> !e.isSplit())
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
+
+    @Transient
     public BigDecimal getExpensesTotalByUserId(Long userId){
         return expenses.stream()
                 .filter(e -> e.getUser().getId() == userId)
@@ -56,9 +64,18 @@ public class SplitGroup {
     }
 
     @Transient
-    public BigDecimal getAmountOwedByUserId(Long userId, int numUsers){
-        return getExpensesTotal().divide(BigDecimal.valueOf(numUsers),2, RoundingMode.HALF_EVEN)
-                .subtract(getExpensesTotalByUserId(userId));
+    public BigDecimal getExpensesNotSplitTotalByUserId(Long userId){
+        return expenses.stream()
+                .filter(e -> e.getUser().getId() == userId
+                && !e.isSplit())
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transient
+    public BigDecimal getAmountOwedByUserId(Long userId){
+        return getExpensesNotSplitTotal().divide(BigDecimal.valueOf(groupMembers.size()),2, RoundingMode.HALF_EVEN)
+                .subtract(getExpensesNotSplitTotalByUserId(userId));
     }
 
 }

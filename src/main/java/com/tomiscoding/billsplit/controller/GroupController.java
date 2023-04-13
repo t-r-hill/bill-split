@@ -4,9 +4,9 @@ import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Currency;
+import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
-import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.PaymentService;
 import com.tomiscoding.billsplit.service.UserService;
@@ -42,11 +42,13 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
-    public String showGroupWithUsersAndExpenses(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
-        SplitGroup splitGroup = groupService.getGroupWithExpensesById(id);
+    public String showGroupOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
+        SplitGroup splitGroup = groupService.getGroupWithExpensesAndMembersById(id);
         List<User> users = userService.getUsersBySplitGroup(splitGroup);
+        List<Payment> payments = paymentService.getPaymentsBySplitGroup(splitGroup);
         model.addAttribute("splitGroup", splitGroup);
         model.addAttribute("users", users);
+        model.addAttribute("payments", payments);
         return "splitGroup";
     }
 
