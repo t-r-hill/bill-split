@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.controller;
 
+import com.tomiscoding.billsplit.dto.ExpenseSearchFilter;
 import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
@@ -8,6 +9,7 @@ import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
+import com.tomiscoding.billsplit.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,9 @@ public class ExpenseController {
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    SearchService searchService;
 
     @GetMapping("/new")
     public String showCreateExpense(@RequestParam Long splitGroupId, Model model) throws SplitGroupNotFoundException {
@@ -73,6 +78,8 @@ public class ExpenseController {
     @GetMapping("/search")
     public String showExpenseSearch(Model model, Authentication authentication){
         User activeUser = (User) authentication.getPrincipal();
-
+        ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
+        model.addAttribute("filterOptions", expenseSearchFilter);
+        return "expense-search";
     }
 }

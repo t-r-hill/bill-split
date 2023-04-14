@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}" th:with="activeTab='splitGroups'">
+<head>
+    <title>Expense Search</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="row">
+        <div class="col">
+            <h3 th:text="${splitGroup.groupName}">Search expenses</h3>
+        </div>
+    </div>
+    <div class="row">
+        <form th:action="/expense/search" th:object="${filterOptions}" method="post">
+            <div class="col-auto">
+
+            </div>
+        </form>
+    </div>
+    <!-- Group expenses table - can this be collapsible-->
+    <div class="row mb-20" align="center">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Date</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Currency</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="expense:${splitGroup.expenses}">
+                <td th:text="${expense.user.fullName}" scope="col"></td>
+                <td th:text="${expense.expenseDate}" scope="col"></td>
+                <td th:text="${expense.name}" scope="col"></td>
+                <td th:text="${expense.expenseDescription}" scope="col"></td>
+                <td th:text="${expense.amount}" scope="col"></td>
+                <td th:text="${expense.currency}" scope="col"></td>
+                <td scope="col">
+                    <div th:if="${expense.isSplit}" class="btn-group btn-group-sm">
+                        <span>Settled</span>
+                    </div>
+                    <div th:if="${!expense.isSplit && expense.user.id == __${#authentication.principal.id}__}" class="btn-group btn-group-sm">
+                        <a class="btn btn-secondary" th:href="@{/expense/{id}/edit(id=${expense.id})}">Edit</a>
+                        <a class="btn btn-danger" th:href="@{/expense/{id}/delete(id=${expense.id})}">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
