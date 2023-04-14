@@ -51,27 +51,29 @@
                     <th scope="col"></th>
                     <th scope="col">Group Expenses</th>
                     <th scope="col">Your Expenses</th>
-                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__)} > 0 ? 'Paid to you' : 'Paid by you'" scope="col">Amount you owe</th>
+                    <th th:text="${splitGroup.getConfirmedPaymentsTotalByUserId(__${#authentication.principal.id}__)} > 0 ? 'Payment to you' : 'Payment by you'" scope="col">Paid to you</th>
+                    <th th:text="${splitGroup.getNotConfirmedPaymentsTotalByUserId(__${#authentication.principal.id}__)} > 0 ? 'Pending payment to you' : 'Pending payment by you'" scope="col">Pending paid to you</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
                     <td th:text="${splitGroup.getExpensesTotal()}">Total expenses</td>
-                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Your expenses</td>
-                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).abs()}">Amount owed</td>
+                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Total expenses</td>
+                    <td th:text="${splitGroup.getConfirmedPaymentsTotalByUserId(__${#authentication.principal.id}__)}">Paid to you</td>
+                    <td th:text="${splitGroup.getNotConfirmedPaymentsTotalByUserId(__${#authentication.principal.id}__).abs()}">Pending paid to you</td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div th:if="${!payments.isEmpty()}" class="row justify-content-between">
+    <div th:if="${!splitGroup.payments.isEmpty()}" class="row justify-content-between">
         <div class="col">
             <h4>Payments</h4>
         </div>
     </div>
     <!-- Group payments table - can this be collapsible-->
-    <div th:if="${!payments.isEmpty()}" class="row mb-20" align="center">
+    <div th:if="${!splitGroup.payments.isEmpty()}" class="row mb-20" align="center">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -83,7 +85,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="payment:${payments}">
+            <tr th:each="payment:${splitGroup.payments}">
                 <td th:text="${payment.fromUser.fullName}" scope="col"></td>
                 <td th:text="${payment.toUser.fullName}" scope="col"></td>
                 <td th:text="${payment.amount}" scope="col"></td>

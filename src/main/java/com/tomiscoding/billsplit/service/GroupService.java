@@ -63,6 +63,11 @@ public class GroupService {
         group = groupRepository.getSplitGroupWithGroupMembersById(id).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
         );
+
+        group = groupRepository.getSplitGroupWithPaymentsById(id).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
+        );
+
         return group;
     }
 

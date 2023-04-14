@@ -40,15 +40,19 @@ public class User implements UserDetails {
     private List<GroupMember> groupMembers;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isEnabled = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean accountNonExpired = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean accountNonLocked = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean credentialsNonExpired = true;
 
     @OneToMany(mappedBy = "user")

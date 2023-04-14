@@ -45,10 +45,8 @@ public class GroupController {
     public String showGroupOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupWithExpensesAndMembersById(id);
         List<User> users = userService.getUsersBySplitGroup(splitGroup);
-        List<Payment> payments = paymentService.getPaymentsBySplitGroup(splitGroup);
         model.addAttribute("splitGroup", splitGroup);
         model.addAttribute("users", users);
-        model.addAttribute("payments", payments);
         return "splitGroup";
     }
 

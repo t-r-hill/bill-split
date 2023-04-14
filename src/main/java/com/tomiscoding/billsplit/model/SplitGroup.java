@@ -40,11 +40,34 @@ public class SplitGroup {
     @OneToMany(mappedBy = "splitGroup")
     private List<Expense> expenses = new ArrayList<>();
 
+    @OneToMany(mappedBy = "splitGroup")
+    private List<Payment> payments = new ArrayList<>();
+
+    @Transient
+    public BigDecimal getConfirmedPaymentsTotalByUserId(Long id){
+        return payments.stream()
+                .filter(p -> p.getToUser().getId() == id
+                    || p.getFromUser().getId() == id)
+                .filter(p -> p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transient
+    public BigDecimal getNotConfirmedPaymentsTotalByUserId(Long id){
+        return payments.stream()
+                .filter(p -> p.getToUser().getId() == id
+                        || p.getFromUser().getId() == id)
+                .filter(p -> !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     @Transient
     public BigDecimal getExpensesTotal(){
         return expenses.stream()
                 .map(Expense::getAmount)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Transient
