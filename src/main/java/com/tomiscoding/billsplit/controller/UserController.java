@@ -13,11 +13,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Optional;
 
 @Controller
 public class UserController {
@@ -28,10 +30,20 @@ public class UserController {
     @Autowired
     GroupService groupService;
 
+//    @GetMapping("/login")
+//    public String showLoginPage(Model model){
+//        User user = User.builder().build();
+//        model.addAttribute("user", user);
+//        return "login";
+//    }
+
     @GetMapping("/login")
-    public String showLoginPage(Model model){
+    public String showLoginErrorPage(@RequestParam(required = false, defaultValue = "false") Boolean error, Model model){
         User user = User.builder().build();
         model.addAttribute("user", user);
+        if (error){
+            model.addAttribute("errorMessage", "error");
+        }
         return "login";
     }
 

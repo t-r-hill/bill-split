@@ -1,5 +1,6 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.dto.UserBalance;
 import com.tomiscoding.billsplit.exceptions.PaymentNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.*;
@@ -25,8 +26,8 @@ public class PaymentService {
     @Autowired
     UserService userService;
 
-    public List<Payment> getPaymentsBySplitGroup(SplitGroup splitGroup){
-        return paymentRepository.getPaymentsBySplitGroup(splitGroup);
+    public List<Payment> getPaymentsBySplitGroupAndUser(SplitGroup splitGroup, User user){
+        return paymentRepository.getPaymentsBySplitGroupAndUser(splitGroup, user);
     }
 
     public Payment getPaymentById(Long id) throws PaymentNotFoundException {

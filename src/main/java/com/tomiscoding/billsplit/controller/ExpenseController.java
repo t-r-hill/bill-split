@@ -69,4 +69,10 @@ public class ExpenseController {
         expense = expenseService.saveExpense(expense);
         return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
     }
+
+    @GetMapping("/search")
+    public String showExpenseSearch(Model model, Authentication authentication){
+        User activeUser = (User) authentication.getPrincipal();
+
+    }
 }

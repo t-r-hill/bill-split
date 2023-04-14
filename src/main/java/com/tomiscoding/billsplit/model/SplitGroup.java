@@ -44,23 +44,44 @@ public class SplitGroup {
     private List<Payment> payments = new ArrayList<>();
 
     @Transient
-    public BigDecimal getConfirmedPaymentsTotalByUserId(Long id){
+    public BigDecimal getConfirmedPaymentsTotalForUserId(Long id){
         return payments.stream()
                 .filter(p -> p.getToUser().getId() == id
-                    || p.getFromUser().getId() == id)
-                .filter(p -> p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                    && p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
                 .map(Payment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .subtract(
+                        payments.stream()
+                        .filter(p -> p.getFromUser().getId() == id
+                                && p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                        .map(Payment::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                );
     }
 
     @Transient
-    public BigDecimal getNotConfirmedPaymentsTotalByUserId(Long id){
+    public BigDecimal getNotConfirmedPaymentsTotalForUserId(Long id){
         return payments.stream()
                 .filter(p -> p.getToUser().getId() == id
-                        || p.getFromUser().getId() == id)
-                .filter(p -> !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                        && !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
                 .map(Payment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .subtract(
+                        payments.stream()
+                                .filter(p -> p.getFromUser().getId() == id
+                                        && !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                                .map(Payment::getAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                );
+    }
+
+    @Transient
+    public boolean isUserAdmin(Long userId){
+        return groupMembers.stream()
+                .filter(m -> m.getUser().getId() == userId)
+                .findFirst()
+                .get()
+                .isAdmin();
     }
 
     @Transient

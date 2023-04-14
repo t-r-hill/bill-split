@@ -1,5 +1,6 @@
-package com.tomiscoding.billsplit.model;
+package com.tomiscoding.billsplit.dto;
 
+import com.tomiscoding.billsplit.model.User;
 import lombok.*;
 
 import java.math.BigDecimal;

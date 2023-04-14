@@ -14,6 +14,9 @@ public interface GroupRepository extends JpaRepository<SplitGroup, Long> {
 
     List<SplitGroup> getByGroupMembers_User(User user);
 
+    @EntityGraph(attributePaths = {"groupMembers"})
+    List<SplitGroup> getSplitGroupWithGroupMembersByGroupMembers_User(User user);
+
     @EntityGraph(attributePaths = {"expenses"})
     Optional<SplitGroup> getSplitGroupWithExpensesById(Long id);
 

@@ -16,7 +16,7 @@ public class GroupMember {
     @GeneratedValue
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

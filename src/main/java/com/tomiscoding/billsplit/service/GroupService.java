@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -55,7 +53,7 @@ public class GroupService {
         );
     }
 
-    public SplitGroup getGroupWithExpensesAndMembersById(Long id) throws SplitGroupNotFoundException {
+    public SplitGroup getGroupWithExpensesMembersPaymentsById(Long id) throws SplitGroupNotFoundException {
         SplitGroup group = groupRepository.getSplitGroupWithExpensesById(id).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
         );
@@ -65,6 +63,18 @@ public class GroupService {
         );
 
         group = groupRepository.getSplitGroupWithPaymentsById(id).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
+        );
+
+        return group;
+    }
+
+    public SplitGroup getGroupWithExpensesMembersById(Long id) throws SplitGroupNotFoundException {
+        SplitGroup group = groupRepository.getSplitGroupWithExpensesById(id).orElseThrow(
+                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
+        );
+
+        group = groupRepository.getSplitGroupWithGroupMembersById(id).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
         );
 
@@ -86,6 +96,10 @@ public class GroupService {
     }
 
     public List<SplitGroup> getGroupsByUser(User user){
+        return groupRepository.getByGroupMembers_User(user);
+    }
+
+    public List<SplitGroup> getGroupsWithGroupMembersByUser(User user){
         return groupRepository.getByGroupMembers_User(user);
     }
 

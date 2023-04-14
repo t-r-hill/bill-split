@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -53,14 +54,22 @@ public class ExpenseService {
         expenseRepository.delete(expense);
     }
 
+    public void deleteExpensesList(List<Expense> expenses){
+        expenses = expenses.stream()
+                .filter(e -> !e.isSplit())
+                .collect(Collectors.toList());
+
+        expenseRepository.deleteAllInBatch(expenses);
+    }
+
     public List<Expense> setExpensesAsSplitByGroup(SplitGroup splitGroup){
         List<Expense> expenses = splitGroup.getExpenses();
         expenses.forEach(e -> e.setSplit(true));
         return expenseRepository.saveAll(expenses);
     }
 
-    public List<Expense> getExpenseByGroup(SplitGroup splitGroup){
-        return expenseRepository.getExpenseBySplitGroup(splitGroup);
+    public List<Expense> getExpenseByUserIdAndSplitGroupId(Long userId, Long splitGroupId){
+        return expenseRepository.getExpensesByUserIdAndSplitGroupId(userId, splitGroupId);
     }
 
     private void validateExpense(Expense expense) throws ValidationException {

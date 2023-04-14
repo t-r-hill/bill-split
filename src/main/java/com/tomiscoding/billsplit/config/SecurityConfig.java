@@ -21,6 +21,7 @@ public class SecurityConfig{
                 .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/overview")
+                        .failureUrl("/login?error=true")
                         .permitAll());
         return http.build();
     }

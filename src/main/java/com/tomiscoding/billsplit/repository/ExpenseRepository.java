@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    public List<Expense> getExpenseByUser(User user);
+    List<Expense> getExpenseByUser(User user);
 
-    public List<Expense> getExpenseBySplitGroup(SplitGroup splitGroup);
+    List<Expense> getExpenseBySplitGroup(SplitGroup splitGroup);
+
+    List<Expense> getExpensesByUserIdAndSplitGroupId(Long userId, Long splitGroupId);
 }

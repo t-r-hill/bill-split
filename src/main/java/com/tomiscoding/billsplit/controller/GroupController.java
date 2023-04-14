@@ -1,12 +1,11 @@
 package com.tomiscoding.billsplit.controller;
 
 import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
+import com.tomiscoding.billsplit.exceptions.GroupMemberNotFoundException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
-import com.tomiscoding.billsplit.model.Currency;
-import com.tomiscoding.billsplit.model.Payment;
-import com.tomiscoding.billsplit.model.SplitGroup;
-import com.tomiscoding.billsplit.model.User;
+import com.tomiscoding.billsplit.model.*;
+import com.tomiscoding.billsplit.service.GroupMemberService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.PaymentService;
 import com.tomiscoding.billsplit.service.UserService;
@@ -33,21 +32,36 @@ public class GroupController {
     @Autowired
     PaymentService paymentService;
 
+    @Autowired
+    GroupMemberService groupMemberService;
+
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
         User user = (User) authentication.getPrincipal();
-        List<SplitGroup> splitGroups = groupService.getGroupsByUser(user);
+        List<SplitGroup> splitGroups = groupService.getGroupsWithGroupMembersByUser(user);
         model.addAttribute("splitGroups", splitGroups);
         return "splitGroups";
     }
 
     @GetMapping("/{id}")
-    public String showGroupOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
-        SplitGroup splitGroup = groupService.getGroupWithExpensesAndMembersById(id);
+    public String showGroupOverview(@PathVariable Long id, Authentication authentication, Model model) throws SplitGroupNotFoundException {
+        User user = (User) authentication.getPrincipal();
+        SplitGroup splitGroup = groupService.getGroupWithExpensesMembersPaymentsById(id);
         List<User> users = userService.getUsersBySplitGroup(splitGroup);
+        List<Payment> payments = paymentService.getPaymentsBySplitGroupAndUser(splitGroup, user);
+        model.addAttribute("payments", payments);
         model.addAttribute("splitGroup", splitGroup);
         model.addAttribute("users", users);
         return "splitGroup";
+    }
+
+    @GetMapping("/{id}/admin")
+    public String showGroupAdminOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
+        SplitGroup splitGroup = groupService.getGroupWithExpensesMembersPaymentsById(id);
+        List<User> users = userService.getUsersBySplitGroup(splitGroup);
+        model.addAttribute("splitGroup", splitGroup);
+        model.addAttribute("users", users);
+        return "splitGroup-admin";
     }
 
     @GetMapping("/new")
@@ -105,5 +119,24 @@ public class GroupController {
             }
         }
         return "redirect:/splitGroup";
+    }
+
+    @GetMapping("/{groupId}/user/{userId}")
+    public String changeGroupMember(@RequestParam String action,
+                                         @PathVariable Long groupId,
+                                         @PathVariable Long userId) throws GroupMemberNotFoundException, ValidationException {
+        GroupMember groupMember = groupMemberService.getGroupMemberByGroupIdAndUserId(groupId, userId);
+        switch (action) {
+            case "add_admin":
+                groupMemberService.makeGroupMemberAdmin(groupMember);
+                break;
+            case "remove_admin":
+                groupMemberService.removeGroupMemberAdmin(groupMember, groupId);
+                break;
+            case "remove":
+                groupMemberService.deleteGroupMember(groupMember, groupId);
+                break;
+        }
+        return "redirect:/splitGroup/" + groupId + "/admin";
     }
 }
