@@ -38,7 +38,7 @@ public class GroupController {
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
         User user = (User) authentication.getPrincipal();
-        List<SplitGroup> splitGroups = groupService.getGroupsWithGroupMembersByUser(user);
+        List<SplitGroup> splitGroups = groupService.getGroupsByUser(user);
         model.addAttribute("splitGroups", splitGroups);
         return "splitGroups";
     }

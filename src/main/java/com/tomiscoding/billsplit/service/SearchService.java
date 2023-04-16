@@ -27,4 +27,19 @@ public class SearchService {
                 .users(users)
                 .build();
     }
+
+    public ExpenseSearchFilter updateExpenseSearchOptions(User activeUser, User selectedUser){
+
+        //Update so that when a user is selected, only the groups which they are a member of are given as options
+
+        List<SplitGroup> splitGroups = groupService.getGroupsWithGroupMembersByUser(activeUser);
+        List<User> users = splitGroups.stream()
+                .flatMap(sg -> sg.getGroupMembers().stream()
+                        .map(GroupMember::getUser))
+                .collect(Collectors.toList());
+        return ExpenseSearchFilter.builder()
+                .splitGroups(splitGroups)
+                .users(users)
+                .build();
+    }
 }

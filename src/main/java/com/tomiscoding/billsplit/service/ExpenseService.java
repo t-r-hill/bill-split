@@ -4,6 +4,7 @@ import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
+import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.ExpenseRepository;
 import org.aspectj.weaver.tools.MatchingContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,14 @@ public class ExpenseService {
 
     public List<Expense> getExpenseByUserIdAndSplitGroupId(Long userId, Long splitGroupId){
         return expenseRepository.getExpensesByUserIdAndSplitGroupId(userId, splitGroupId);
+    }
+
+    public List<Expense> getExpenseByUserAndSplitGroupAndIsSplit(User user, SplitGroup splitGroup, Boolean isSplit){
+        return expenseRepository.getExpensesByUserAndSplitGroupAndIsSplit(user, splitGroup, isSplit);
+    }
+
+    public List<Expense> getExpenseBySplitGroupAndIsSplit(SplitGroup splitGroup, Boolean isSplit){
+        return expenseRepository.getExpensesBySplitGroupAndIsSplit(splitGroup, isSplit);
     }
 
     private void validateExpense(Expense expense) throws ValidationException {

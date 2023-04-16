@@ -9,13 +9,31 @@
 <div layout:fragment="content" th:remove="tag">
     <div class="row">
         <div class="col">
-            <h3 th:text="${splitGroup.groupName}">Search expenses</h3>
+            <h3>Search expenses</h3>
         </div>
     </div>
     <div class="row">
-        <form th:action="/expense/search" th:object="${filterOptions}" method="post">
-            <div class="col-auto">
-
+        <form th:action="@{/expense/search}" th:object="${filterOptions}" method="post">
+            <div class="row align-items-center">
+                <label class="col-auto" th:for="*{splitGroup}">Group Name</label>
+                <div class="col-auto mr-20">
+                    <select class="form-select" th:field="*{splitGroup}" onChange="this.form.submit()">
+                        <option th:if="*{splitGroups.isEmpty()}" th:value="null">No Groups Available</option>
+                        <option th:each="eachSplitGroup: *{splitGroups}" th:value="${eachSplitGroup.id}" th:text="${eachSplitGroup.groupName}">Group list</option>
+                    </select>
+                </div>
+                <label class="col-auto" th:for="*{user}">User Name</label>
+                <div class="col-auto mr-20">
+                    <select class="form-select" th:field="*{user}" onChange="this.form.submit()">
+                        <option th:if="*{users.isEmpty()}" th:value="null">No Groups Available</option>
+                        <option th:unless="*{users.isEmpty()}" th:value="null">All users</option>
+                        <option th:each="eachUser: *{users}" th:value="${eachUser.id}" th:text="${eachUser.fullName}">Group list</option>
+                    </select>
+                </div>
+                <div class="form-check form-switch col-auto">
+                    <input class="form-check-input" type="checkbox" role="switch" th:field="*{isSplit}" onchange="this.form.submit()">
+                    <label class="form-check-label" th:for="*{isSplit}">Already split</label>
+                </div>
             </div>
         </form>
     </div>
@@ -30,26 +48,18 @@
                 <th scope="col">Description</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Currency</th>
-                <th scope="col">Actions</th>
+                <th scope="col">Already split</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="expense:${splitGroup.expenses}">
+            <tr th:each="expense:${expenses}">
                 <td th:text="${expense.user.fullName}" scope="col"></td>
                 <td th:text="${expense.expenseDate}" scope="col"></td>
                 <td th:text="${expense.name}" scope="col"></td>
                 <td th:text="${expense.expenseDescription}" scope="col"></td>
                 <td th:text="${expense.amount}" scope="col"></td>
                 <td th:text="${expense.currency}" scope="col"></td>
-                <td scope="col">
-                    <div th:if="${expense.isSplit}" class="btn-group btn-group-sm">
-                        <span>Settled</span>
-                    </div>
-                    <div th:if="${!expense.isSplit && expense.user.id == __${#authentication.principal.id}__}" class="btn-group btn-group-sm">
-                        <a class="btn btn-secondary" th:href="@{/expense/{id}/edit(id=${expense.id})}">Edit</a>
-                        <a class="btn btn-danger" th:href="@{/expense/{id}/delete(id=${expense.id})}">Delete</a>
-                    </div>
-                </td>
+                <td th:text="${expense.isSplit} ? 'Split' : 'Not split'" scope="col"></td>
             </tr>
             </tbody>
         </table>

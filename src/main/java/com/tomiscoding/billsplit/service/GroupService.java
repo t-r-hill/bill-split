@@ -100,7 +100,7 @@ public class GroupService {
     }
 
     public List<SplitGroup> getGroupsWithGroupMembersByUser(User user){
-        return groupRepository.getByGroupMembers_User(user);
+        return groupRepository.getSplitGroupWithGroupMembersByGroupMembers_User(user);
     }
 
     // Helper function to generate a random code to externally identify the group

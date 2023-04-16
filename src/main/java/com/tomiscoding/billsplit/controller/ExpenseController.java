@@ -82,4 +82,33 @@ public class ExpenseController {
         model.addAttribute("filterOptions", expenseSearchFilter);
         return "expense-search";
     }
+
+    @PostMapping("/search")
+    public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication){
+        User activeUser = (User) authentication.getPrincipal();
+
+        // Maybe need to dynamically update the filterOptions so that selected values are pre-populated and options are responsively updated
+        ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
+        expenseSearchFilter.setUser(filterOptions.getUser());
+        expenseSearchFilter.setSplitGroup(filterOptions.getSplitGroup());
+        expenseSearchFilter.setIsSplit(filterOptions.getIsSplit());
+        model.addAttribute("filterOptions", expenseSearchFilter);
+
+        // Get search results and add to model
+        List<Expense> expenses;
+        if (filterOptions.getUser() == null){
+            expenses = expenseService.getExpenseBySplitGroupAndIsSplit(
+                    filterOptions.getSplitGroup(),
+                    filterOptions.getIsSplit());
+        } else {
+            expenses = expenseService.getExpenseByUserAndSplitGroupAndIsSplit(
+                    filterOptions.getUser(),
+                    filterOptions.getSplitGroup(),
+                    filterOptions.getIsSplit());
+        }
+
+        model.addAttribute("expenses", expenses);
+
+        return "expense-search";
+    }
 }

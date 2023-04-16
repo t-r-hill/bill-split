@@ -14,4 +14,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> getExpenseBySplitGroup(SplitGroup splitGroup);
 
     List<Expense> getExpensesByUserIdAndSplitGroupId(Long userId, Long splitGroupId);
+
+    List<Expense> getExpensesByUserAndSplitGroupAndIsSplit(User user, SplitGroup splitGroup, Boolean isSplit);
+
+    List<Expense> getExpensesBySplitGroupAndIsSplit(SplitGroup splitGroup, Boolean isSplit);
 }
