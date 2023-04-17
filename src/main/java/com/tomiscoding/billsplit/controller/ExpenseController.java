@@ -6,11 +6,13 @@ import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.model.Expense;
+import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -76,38 +78,61 @@ public class ExpenseController {
     }
 
     @GetMapping("/search")
-    public String showExpenseSearch(Model model, Authentication authentication){
+    public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
         ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
+        expenseSearchFilter.setUser(activeUser);
+        expenseSearchFilter.setCurrentPageNum(0);
+        expenseSearchFilter.setIsSplit(true);
+
+        Page<Expense> expenses;
+        if (groupId != 0){
+            SplitGroup splitGroup = groupService.getGroupById(groupId);
+            expenseSearchFilter.setSplitGroup(splitGroup);
+        }
+        // Get search results and add to model
+        expenses = expenseService.getExpenseBySplitGroupIdAndIsSplit(
+                    expenseSearchFilter.getSplitGroup().getId(),
+                    expenseSearchFilter.getIsSplit(),
+                    expenseSearchFilter.getCurrentPageNum());
+        expenseSearchFilter.setNumPages(expenses.getTotalPages());
+
         model.addAttribute("filterOptions", expenseSearchFilter);
+        model.addAttribute("expenses", expenses.getContent());
+
         return "expense-search";
     }
 
     @PostMapping("/search")
     public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication){
         User activeUser = (User) authentication.getPrincipal();
+        Integer pageNum = filterOptions.getSelectedPageNum() == null ? 0 : filterOptions.getSelectedPageNum();
 
         // Maybe need to dynamically update the filterOptions so that selected values are pre-populated and options are responsively updated
         ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
         expenseSearchFilter.setUser(filterOptions.getUser());
         expenseSearchFilter.setSplitGroup(filterOptions.getSplitGroup());
         expenseSearchFilter.setIsSplit(filterOptions.getIsSplit());
-        model.addAttribute("filterOptions", expenseSearchFilter);
+        expenseSearchFilter.setCurrentPageNum(pageNum);
 
         // Get search results and add to model
-        List<Expense> expenses;
+        Page<Expense> expenses;
         if (filterOptions.getUser() == null){
-            expenses = expenseService.getExpenseBySplitGroupAndIsSplit(
-                    filterOptions.getSplitGroup(),
-                    filterOptions.getIsSplit());
+            expenses = expenseService.getExpenseBySplitGroupIdAndIsSplit(
+                    expenseSearchFilter.getSplitGroup().getId(),
+                    expenseSearchFilter.getIsSplit(),
+                    expenseSearchFilter.getCurrentPageNum());
         } else {
-            expenses = expenseService.getExpenseByUserAndSplitGroupAndIsSplit(
-                    filterOptions.getUser(),
-                    filterOptions.getSplitGroup(),
-                    filterOptions.getIsSplit());
+            expenses = expenseService.getExpenseByUserIdAndSplitGroupIdAndIsSplit(
+                    expenseSearchFilter.getUser().getId(),
+                    expenseSearchFilter.getSplitGroup().getId(),
+                    expenseSearchFilter.getIsSplit(),
+                    expenseSearchFilter.getCurrentPageNum());
         }
+        expenseSearchFilter.setNumPages(expenses.getTotalPages());
 
-        model.addAttribute("expenses", expenses);
+        model.addAttribute("filterOptions", expenseSearchFilter);
+        model.addAttribute("expenses", expenses.getContent());
 
         return "expense-search";
     }

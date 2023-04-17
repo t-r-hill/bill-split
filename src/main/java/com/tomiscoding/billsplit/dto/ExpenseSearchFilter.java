@@ -4,8 +4,6 @@ import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -22,6 +20,7 @@ public class ExpenseSearchFilter {
     private User user;
     private Boolean isSplit;
 
-    private int pageNum;
-    private int numExpenses;
+    private Integer selectedPageNum;
+    private Integer currentPageNum;
+    private Integer numPages;
 }

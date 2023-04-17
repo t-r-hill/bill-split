@@ -15,24 +15,52 @@
     <div class="row">
         <form th:action="@{/expense/search}" th:object="${filterOptions}" method="post">
             <div class="row align-items-center">
-                <label class="col-auto" th:for="*{splitGroup}">Group Name</label>
-                <div class="col-auto mr-20">
+                <label class="col" th:for="*{splitGroup}">Group Name</label>
+                <div class="col mr-20">
                     <select class="form-select" th:field="*{splitGroup}" onChange="this.form.submit()">
                         <option th:if="*{splitGroups.isEmpty()}" th:value="null">No Groups Available</option>
                         <option th:each="eachSplitGroup: *{splitGroups}" th:value="${eachSplitGroup.id}" th:text="${eachSplitGroup.groupName}">Group list</option>
                     </select>
                 </div>
-                <label class="col-auto" th:for="*{user}">User Name</label>
-                <div class="col-auto mr-20">
+                <label class="col" th:for="*{user}">User Name</label>
+                <div class="col mr-20">
                     <select class="form-select" th:field="*{user}" onChange="this.form.submit()">
                         <option th:if="*{users.isEmpty()}" th:value="null">No Groups Available</option>
                         <option th:unless="*{users.isEmpty()}" th:value="null">All users</option>
                         <option th:each="eachUser: *{users}" th:value="${eachUser.id}" th:text="${eachUser.fullName}">Group list</option>
                     </select>
                 </div>
-                <div class="form-check form-switch col-auto">
+                <div class="form-check form-switch col">
                     <input class="form-check-input" type="checkbox" role="switch" th:field="*{isSplit}" onchange="this.form.submit()">
                     <label class="form-check-label" th:for="*{isSplit}">Already split</label>
+                </div>
+                <div class="col">
+                    <nav aria-label="Search pagination">
+                        <ul class="pagination">
+                            <li th:if="*{currentPageNum} <= 0" class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&laquo;</span>
+                            </li>
+                            <li th:unless="*{currentPageNum} <= 0" class="page-item">
+                                <button class="page-link" name="selectedPageNum" th:value="*{currentPageNum} - 1" type="submit">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </button>
+                            </li>
+                            <li th:unless="*{currentPageNum} <= 0" class="page-item">
+                                <button name="selectedPageNum" th:value="*{currentPageNum} - 1" th:text="*{currentPageNum}" class="page-link" type="submit">1</button>
+                            </li>
+                            <li class="page-item active">
+                                <button name="selectedPageNum" th:value="*{currentPageNum}" th:text="*{currentPageNum} + 1" class="page-link" type="submit">2</button>
+                            </li>
+                            <li th:unless="${filterOptions.numPages == null || filterOptions.currentPageNum >= filterOptions.numPages - 1}" class="page-item">
+                                <button class="page-link" name="selectedPageNum" th:value="*{currentPageNum} + 1" type="submit">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </button>
+                            </li>
+                            <li th:if="${filterOptions.numPages == null || filterOptions.currentPageNum >= filterOptions.numPages - 1}" class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&raquo;</span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </form>
@@ -48,7 +76,7 @@
                 <th scope="col">Description</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Currency</th>
-                <th scope="col">Already split</th>
+                <th scope="col">Status</th>
             </tr>
             </thead>
             <tbody>

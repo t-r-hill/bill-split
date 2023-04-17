@@ -8,6 +8,10 @@ import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.ExpenseRepository;
 import org.aspectj.weaver.tools.MatchingContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -73,12 +77,14 @@ public class ExpenseService {
         return expenseRepository.getExpensesByUserIdAndSplitGroupId(userId, splitGroupId);
     }
 
-    public List<Expense> getExpenseByUserAndSplitGroupAndIsSplit(User user, SplitGroup splitGroup, Boolean isSplit){
-        return expenseRepository.getExpensesByUserAndSplitGroupAndIsSplit(user, splitGroup, isSplit);
+    public Page<Expense> getExpenseByUserIdAndSplitGroupIdAndIsSplit(Long userId, Long splitGroupId, Boolean isSplit, Integer pageNum){
+        PageRequest pageRequest = PageRequest.of(pageNum, 3).withSort(Sort.Direction.DESC,"expenseDate");
+        return expenseRepository.getExpensesByUserIdAndSplitGroupIdAndIsSplit(userId, splitGroupId, isSplit, pageRequest);
     }
 
-    public List<Expense> getExpenseBySplitGroupAndIsSplit(SplitGroup splitGroup, Boolean isSplit){
-        return expenseRepository.getExpensesBySplitGroupAndIsSplit(splitGroup, isSplit);
+    public Page<Expense> getExpenseBySplitGroupIdAndIsSplit(Long splitGroupId, Boolean isSplit, Integer pageNum){
+        PageRequest pageRequest = PageRequest.of(pageNum, 3).withSort(Sort.Direction.DESC,"expenseDate");
+        return expenseRepository.getExpensesBySplitGroupIdAndIsSplit(splitGroupId, isSplit, pageRequest);
     }
 
     private void validateExpense(Expense expense) throws ValidationException {
