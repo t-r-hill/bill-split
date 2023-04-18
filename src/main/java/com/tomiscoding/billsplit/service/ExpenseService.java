@@ -33,9 +33,9 @@ public class ExpenseService {
 
     public Expense saveExpense(Expense expense) throws ValidationException, CurrencyConversionException {
         validateExpense(expense);
+        expense.setCurrencyAmount(expense.getCurrencyAmount().setScale(2, RoundingMode.HALF_EVEN));
         BigDecimal convertedAmount = convertExpenseAmount(expense);
         expense.setAmount(convertedAmount);
-        expense.setCurrencyAmount(expense.getAmount().setScale(2, RoundingMode.HALF_EVEN));
         return expenseRepository.save(expense);
     }
 
@@ -97,8 +97,15 @@ public class ExpenseService {
     private BigDecimal convertExpenseAmount(Expense expense) throws CurrencyConversionException {
         Currency fromCurrency = expense.getCurrency();
         Currency toCurrency = expense.getSplitGroup().getBaseCurrency();
-        BigDecimal conversionRate = currencyConversionService.getCurrencyConversion(fromCurrency, toCurrency);
-        return expense.getAmount().divide(conversionRate,2,RoundingMode.HALF_EVEN);
+
+        BigDecimal convertedAmount;
+        if (fromCurrency.equals(toCurrency)){
+            convertedAmount = expense.getCurrencyAmount();
+        } else {
+            BigDecimal conversionRate = currencyConversionService.getCurrencyConversion(fromCurrency, toCurrency);
+            convertedAmount = expense.getCurrencyAmount().divide(conversionRate,2,RoundingMode.HALF_EVEN);
+        }
+        return convertedAmount;
     }
 
     private void validateExpense(Expense expense) throws ValidationException {

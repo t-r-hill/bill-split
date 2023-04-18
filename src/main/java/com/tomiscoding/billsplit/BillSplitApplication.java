@@ -2,8 +2,13 @@ package com.tomiscoding.billsplit;
 
 import com.tomiscoding.billsplit.model.Authority;
 import com.tomiscoding.billsplit.model.Currency;
+import com.tomiscoding.billsplit.model.SplitGroup;
+import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.AuthorityRepository;
 import com.tomiscoding.billsplit.service.CurrencyConversionService;
+import com.tomiscoding.billsplit.service.GroupService;
+import com.tomiscoding.billsplit.service.MailerSendService;
+import com.tomiscoding.billsplit.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +25,15 @@ public class BillSplitApplication implements CommandLineRunner {
 	@Autowired
 	AuthorityRepository authorityRepository;
 
+	@Autowired
+	MailerSendService mailerSendService;
+
+	@Autowired
+	GroupService groupService;
+
+	@Autowired
+	UserService userService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(BillSplitApplication.class, args);
 	}
@@ -33,5 +47,10 @@ public class BillSplitApplication implements CommandLineRunner {
 		if (authorityRepository.findAll().isEmpty()){
 			authorityRepository.saveAll(Arrays.asList(userRole, adminRole));
 		}
+
+		SplitGroup splitGroup = groupService.getGroupById(4L);
+		User user = userService.loadUserByUsername("peppa@pigs.com");
+
+		mailerSendService.sendInviteEmail("tomhill555@gmail.com", splitGroup, user);
 	}
 }
