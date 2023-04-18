@@ -29,6 +29,9 @@ public class Expense {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    private BigDecimal currencyAmount;
+
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Currency currency;
 

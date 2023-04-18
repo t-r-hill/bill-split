@@ -1,7 +1,9 @@
 package com.tomiscoding.billsplit;
 
 import com.tomiscoding.billsplit.model.Authority;
+import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.repository.AuthorityRepository;
+import com.tomiscoding.billsplit.service.CurrencyConversionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,11 +19,6 @@ public class BillSplitApplication implements CommandLineRunner {
 
 	@Autowired
 	AuthorityRepository authorityRepository;
-
-	@Bean
-	RestTemplate restTemplate(RestTemplateBuilder builder){
-		return builder.build();
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BillSplitApplication.class, args);

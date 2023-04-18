@@ -52,6 +52,9 @@
                                 <button name="selectedPageNum" th:value="*{currentPageNum}" th:text="*{currentPageNum} + 1" class="page-link" type="submit">2</button>
                             </li>
                             <li th:unless="${filterOptions.numPages == null || filterOptions.currentPageNum >= filterOptions.numPages - 1}" class="page-item">
+                                <button name="selectedPageNum" th:value="*{currentPageNum} + 1" th:text="*{currentPageNum} + 2" class="page-link" type="submit">1</button>
+                            </li>
+                            <li th:unless="${filterOptions.numPages == null || filterOptions.currentPageNum >= filterOptions.numPages - 1}" class="page-item">
                                 <button class="page-link" name="selectedPageNum" th:value="*{currentPageNum} + 1" type="submit">
                                     <span aria-hidden="true">&raquo;</span>
                                 </button>
@@ -74,8 +77,9 @@
                 <th scope="col">Date</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Amount</th>
+                <th scope="col">Converted Amount</th>
                 <th scope="col">Currency</th>
+                <th scope="col">Original Amount</th>
                 <th scope="col">Status</th>
             </tr>
             </thead>
@@ -85,8 +89,9 @@
                 <td th:text="${expense.expenseDate}" scope="col"></td>
                 <td th:text="${expense.name}" scope="col"></td>
                 <td th:text="${expense.expenseDescription}" scope="col"></td>
-                <td th:text="${expense.amount}" scope="col"></td>
+                <td th:text="${expense.currencyAmount}" scope="col"></td>
                 <td th:text="${expense.currency}" scope="col"></td>
+                <td th:text="${expense.amount}" scope="col"></td>
                 <td th:text="${expense.isSplit} ? 'Split' : 'Not split'" scope="col"></td>
             </tr>
             </tbody>

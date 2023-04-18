@@ -1,7 +1,9 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
+import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
@@ -26,9 +28,14 @@ public class ExpenseService {
     @Autowired
     ExpenseRepository expenseRepository;
 
-    public Expense saveExpense(Expense expense) throws ValidationException {
+    @Autowired
+    CurrencyConversionService currencyConversionService;
+
+    public Expense saveExpense(Expense expense) throws ValidationException, CurrencyConversionException {
         validateExpense(expense);
-        expense.setAmount(expense.getAmount().setScale(2, RoundingMode.HALF_EVEN));
+        BigDecimal convertedAmount = convertExpenseAmount(expense);
+        expense.setAmount(convertedAmount);
+        expense.setCurrencyAmount(expense.getAmount().setScale(2, RoundingMode.HALF_EVEN));
         return expenseRepository.save(expense);
     }
 
@@ -38,17 +45,17 @@ public class ExpenseService {
         );
     }
 
-    public Expense editExpense(Long id, Expense expense) throws ExpenseNotFoundException, ValidationException {
+    public Expense editExpense(Long id, Expense expense) throws ExpenseNotFoundException, ValidationException, CurrencyConversionException {
         Expense expense1 = getExpense(id);
         if (expense1.isSplit()){
             throw new ValidationException(expense1.getName().toString() + " has already been split so cannot be edited");
         }
         expense1.setExpenseDate(expense.getExpenseDate());
         expense1.setExpenseDescription(expense.getExpenseDescription());
-        expense1.setAmount(expense.getAmount());
+        expense1.setCurrencyAmount(expense.getCurrencyAmount());
         expense1.setCurrency(expense.getCurrency());
         expense1.setName(expense.getName());
-        return expenseRepository.save(expense1);
+        return saveExpense(expense);
     }
 
     public void deleteExpense(Long id) throws ExpenseNotFoundException, ValidationException {
@@ -87,12 +94,19 @@ public class ExpenseService {
         return expenseRepository.getExpensesBySplitGroupIdAndIsSplit(splitGroupId, isSplit, pageRequest);
     }
 
+    private BigDecimal convertExpenseAmount(Expense expense) throws CurrencyConversionException {
+        Currency fromCurrency = expense.getCurrency();
+        Currency toCurrency = expense.getSplitGroup().getBaseCurrency();
+        BigDecimal conversionRate = currencyConversionService.getCurrencyConversion(fromCurrency, toCurrency);
+        return expense.getAmount().divide(conversionRate,2,RoundingMode.HALF_EVEN);
+    }
+
     private void validateExpense(Expense expense) throws ValidationException {
         if (expense.getName() == null || expense.getName().isBlank()){
             throw new ValidationException("Name must not be blank");
-        } else if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) < 0){
+        } else if (expense.getCurrencyAmount() == null || expense.getCurrencyAmount().compareTo(BigDecimal.ZERO) < 0){
             throw new ValidationException("Amount must be a positive value");
-        } else if (expense.getAmount().scale() > 2){
+        } else if (expense.getCurrencyAmount().scale() > 2){
             throw new ValidationException("Amount must have no more than two decimal places");
         } else if (expense.getCurrency() == null) {
             throw new ValidationException("A currency must be selected");

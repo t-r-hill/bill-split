@@ -11,5 +11,5 @@ import java.util.Map;
 @Builder
 public class CurrencyConversionResponse {
 
-    private Map<String, CurrencyConversionRate> data;
+    private Map<String, CurrencyConversionData> data;
 }

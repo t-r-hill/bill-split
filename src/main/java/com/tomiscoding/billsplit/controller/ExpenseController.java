@@ -1,6 +1,7 @@
 package com.tomiscoding.billsplit.controller;
 
 import com.tomiscoding.billsplit.dto.ExpenseSearchFilter;
+import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
@@ -64,13 +65,13 @@ public class ExpenseController {
     }
 
     @PostMapping("/{id}")
-    public String editExpense(@PathVariable Long id, @ModelAttribute Expense expense) throws ValidationException, ExpenseNotFoundException {
+    public String editExpense(@PathVariable Long id, @ModelAttribute Expense expense) throws ValidationException, ExpenseNotFoundException, CurrencyConversionException {
         expense = expenseService.editExpense(id, expense);
         return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
     }
 
     @PostMapping
-    public String createNewExpense(@ModelAttribute Expense expense, Authentication authentication) throws ValidationException {
+    public String createNewExpense(@ModelAttribute Expense expense, Authentication authentication) throws ValidationException, CurrencyConversionException {
         User user = (User) authentication.getPrincipal();
         expense.setUser(user);
         expense = expenseService.saveExpense(expense);
@@ -81,7 +82,7 @@ public class ExpenseController {
     public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
         ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
-        expenseSearchFilter.setUser(activeUser);
+        expenseSearchFilter.setUser(null);
         expenseSearchFilter.setCurrentPageNum(0);
         expenseSearchFilter.setIsSplit(true);
 

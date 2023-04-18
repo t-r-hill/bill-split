@@ -115,8 +115,9 @@
                 <th scope="col">Date</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Amount</th>
+                <th scope="col">Converted Amount</th>
                 <th scope="col">Currency</th>
+                <th scope="col">Original Amount</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -128,6 +129,7 @@
                 <td th:text="${expense.expenseDescription}" scope="col"></td>
                 <td th:text="${expense.amount}" scope="col"></td>
                 <td th:text="${expense.currency}" scope="col"></td>
+                <td th:text="${expense.currencyAmount}" scope="col"></td>
                 <td scope="col">
                     <div th:if="${expense.isSplit}" class="btn-group btn-group-sm">
                         <span>Settled</span>
