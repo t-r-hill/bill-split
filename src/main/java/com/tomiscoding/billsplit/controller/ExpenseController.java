@@ -35,19 +35,20 @@ public class ExpenseController {
     @Autowired
     SearchService searchService;
 
-    @GetMapping("/new")
-    public String showCreateExpense(@RequestParam Long splitGroupId, Model model) throws SplitGroupNotFoundException {
-        Expense expense = new Expense();
-        if (splitGroupId != null){
-            expense.setSplitGroup(groupService.getGroupById(splitGroupId));
-        }
-        expense.setExpenseDate(LocalDate.now());
-        List<Currency> currencies = List.of(Currency.values());
-        model.addAttribute("currencies", currencies);
-        model.addAttribute("expense", expense);
-        return "expense-new";
-    }
+//    @GetMapping("/new")
+//    public String showCreateExpense(@RequestParam Long splitGroupId, Model model) throws SplitGroupNotFoundException {
+//        Expense expense = new Expense();
+//        if (splitGroupId != null){
+//            expense.setSplitGroup(groupService.getGroupById(splitGroupId));
+//        }
+//        expense.setExpenseDate(LocalDate.now());
+//        List<Currency> currencies = List.of(Currency.values());
+//        model.addAttribute("currencies", currencies);
+//        model.addAttribute("expense", expense);
+//        return "expense-new";
+//    }
 
+    // Only accessed by expense user or group admin
     @GetMapping("/{id}/edit")
     public String showEditExpense(@PathVariable Long id, Model model) throws SplitGroupNotFoundException, ExpenseNotFoundException {
         Expense expense = expenseService.getExpense(id);
@@ -57,6 +58,7 @@ public class ExpenseController {
         return "expense-edit";
     }
 
+    // Only accessed by expense user or group admin
     @GetMapping("/{id}/delete")
     public String deleteExpense(@PathVariable Long id) throws ValidationException, ExpenseNotFoundException {
         long splitGroupId = expenseService.getExpense(id).getSplitGroup().getId();
@@ -64,20 +66,22 @@ public class ExpenseController {
         return "redirect:/splitGroup/" + splitGroupId;
     }
 
+    // Only accessed by expense user or group admin
     @PostMapping("/{id}")
     public String editExpense(@PathVariable Long id, @ModelAttribute Expense expense) throws ValidationException, ExpenseNotFoundException, CurrencyConversionException {
         expense = expenseService.editExpense(id, expense);
         return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
     }
 
-    @PostMapping
-    public String createNewExpense(@ModelAttribute Expense expense, Authentication authentication) throws ValidationException, CurrencyConversionException {
-        User user = (User) authentication.getPrincipal();
-        expense.setUser(user);
-        expense = expenseService.saveExpense(expense);
-        return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
-    }
+//    @PostMapping
+//    public String createNewExpense(@ModelAttribute Expense expense, Authentication authentication) throws ValidationException, CurrencyConversionException {
+//        User user = (User) authentication.getPrincipal();
+//        expense.setUser(user);
+//        expense = expenseService.saveExpense(expense);
+//        return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
+//    }
 
+    // Only accessed by group member
     @GetMapping("/search")
     public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
@@ -104,6 +108,7 @@ public class ExpenseController {
         return "expense-search";
     }
 
+    // Only accessed by group member
     @PostMapping("/search")
     public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication){
         User activeUser = (User) authentication.getPrincipal();

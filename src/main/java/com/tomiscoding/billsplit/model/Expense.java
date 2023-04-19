@@ -46,7 +46,7 @@ public class Expense {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "split_group_id")
     private SplitGroup splitGroup;
 }

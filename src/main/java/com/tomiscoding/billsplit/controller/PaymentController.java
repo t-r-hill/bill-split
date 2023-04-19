@@ -18,6 +18,7 @@ public class PaymentController {
     @Autowired
     PaymentService paymentService;
 
+    // If status = PAID_PENDING only allow fromUser. If status = PAID_CONFIRMED only allow toUser
     @GetMapping("/{id}")
     public String updatePaymentStatus(@PathVariable Long id,
                                       @RequestParam String status) throws PaymentNotFoundException, ValidationException {

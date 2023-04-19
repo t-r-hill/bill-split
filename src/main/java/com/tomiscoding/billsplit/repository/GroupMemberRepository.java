@@ -12,6 +12,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
 
     boolean existsByUserAndSplitGroup(User user, SplitGroup splitGroup);
 
+    boolean existsByUserIdAndSplitGroupIdAndIsAdmin(Long userId, Long splitGroupId, Boolean isAdmin);
+
     Optional<GroupMember> getByUserIdAndSplitGroupId(Long userId, Long splitGroupId);
 
     List<GroupMember> getGroupMembersBySplitGroupIdAndIsAdmin(Long splitGroupId, Boolean isAdmin);

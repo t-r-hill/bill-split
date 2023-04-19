@@ -38,7 +38,7 @@
                 <td th:text="${splitGroup.baseCurrency}" scope="col">Currency</td>
                 <td scope="col">
                     <div class="btn-group btn-group-sm">
-                        <a class="btn btn-secondary" th:href="@{/expense/new(splitGroupId=${splitGroup.id})}">Add expense</a>
+                        <a class="btn btn-secondary" th:href="@{/splitGroup/{splitGroupId}/expense/new(splitGroupId=${splitGroup.id})}">Add expense</a>
                     </div>
                 </td>
                 <td th:if="${splitGroup.isUserAdmin(__${#authentication.principal.id}__)}" scope="col">

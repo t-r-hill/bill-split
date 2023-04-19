@@ -5,6 +5,7 @@ import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.model.Currency;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +27,7 @@ public class CurrencyConversionService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Cacheable(value = "currencies", key = "#fromCurrency.name+#toCurrency.name")
     public BigDecimal getCurrencyConversion(Currency fromCurrency, Currency toCurrency) throws CurrencyConversionException {
 //        // Set http request headers with apikey
 //        HttpHeaders httpHeaders = new HttpHeaders();

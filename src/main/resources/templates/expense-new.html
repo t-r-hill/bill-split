@@ -10,7 +10,7 @@
   <div class="row">
     <div class="offset-3 col-6">
       <h3>Add an expense</h3>
-    <form class="form-horizontal" action="#" th:action="@{/expense}" th:object="${expense}" method="post">
+    <form class="form-horizontal" th:action="@{/splitGroup/{splitGroupId}/expense/new(splitGroupId=${expense.splitGroup.id})}" th:object="${expense}" method="post">
       <input type="hidden" th:field="*{splitGroup}" th:value="${expense.splitGroup.id}"/>
       <div class="form-group row mb-3">
         <label class="control-label col-form-label col-2" for="name">Name</label>
