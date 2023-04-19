@@ -33,10 +33,10 @@
     </div>
     <!-- Send email -->
     <div class="row">
-        <form class="form-horizontal row" action="#" th:action="@{/invite}" method="post">
+        <form class="form-horizontal row" th:action="@{/splitGroup/{id}/invite(id=${splitGroup.id})}" method="post">
             <label class="control-label col-form-label col-auto" for="email">Email</label>
             <div class="col-auto">
-                <input class="form-control" type="text" id="email" th:name="email" required/>
+                <input class="form-control" type="text" id="email" th:name="emailAddress" required/>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Send</button>

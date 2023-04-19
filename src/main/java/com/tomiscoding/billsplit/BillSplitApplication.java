@@ -47,10 +47,5 @@ public class BillSplitApplication implements CommandLineRunner {
 		if (authorityRepository.findAll().isEmpty()){
 			authorityRepository.saveAll(Arrays.asList(userRole, adminRole));
 		}
-
-		SplitGroup splitGroup = groupService.getGroupById(4L);
-		User user = userService.loadUserByUsername("peppa@pigs.com");
-
-		mailerSendService.sendInviteEmail("tomhill555@gmail.com", splitGroup, user);
 	}
 }

@@ -1,14 +1,8 @@
 package com.tomiscoding.billsplit.controller;
 
-import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
-import com.tomiscoding.billsplit.exceptions.GroupMemberNotFoundException;
-import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
-import com.tomiscoding.billsplit.exceptions.ValidationException;
+import com.tomiscoding.billsplit.exceptions.*;
 import com.tomiscoding.billsplit.model.*;
-import com.tomiscoding.billsplit.service.GroupMemberService;
-import com.tomiscoding.billsplit.service.GroupService;
-import com.tomiscoding.billsplit.service.PaymentService;
-import com.tomiscoding.billsplit.service.UserService;
+import com.tomiscoding.billsplit.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -34,6 +28,9 @@ public class GroupController {
 
     @Autowired
     GroupMemberService groupMemberService;
+
+    @Autowired
+    MailerSendService mailerSendService;
 
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
@@ -73,11 +70,22 @@ public class GroupController {
         return "splitGroups-new";
     }
 
-    @GetMapping("/{id}/user/new")
+    @GetMapping("/{id}/invite")
     public String showAddGroupMemberPage(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
         model.addAttribute("splitGroup", splitGroup);
         return "add-group-member";
+    }
+
+    @PostMapping("/{id}/invite")
+    public String sendInviteEmail(@PathVariable Long id,
+                                  @RequestParam String emailAddress,
+                                  Authentication authentication,
+                                  Model model) throws SplitGroupNotFoundException, EmailSendException {
+        User user = (User) authentication.getPrincipal();
+        SplitGroup splitGroup = groupService.getGroupById(id);
+        mailerSendService.sendInviteEmail(emailAddress, splitGroup, user);
+        return "redirect:/splitGroup/" + id;
     }
 
     @PostMapping

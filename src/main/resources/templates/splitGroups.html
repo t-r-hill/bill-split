@@ -43,7 +43,7 @@
                 </td>
                 <td th:if="${splitGroup.isUserAdmin(__${#authentication.principal.id}__)}" scope="col">
                     <div class="btn-group btn-group-sm">
-                        <a class="btn btn-secondary" th:href="@{/splitGroup/{id}/user/new(id=${splitGroup.id})}">Add member</a>
+                        <a class="btn btn-secondary" th:href="@{/splitGroup/{id}/invite(id=${splitGroup.id})}">Add member</a>
                         <a class="btn btn-secondary" th:href="@{/splitGroup/{id}/admin(id=${splitGroup.id})}">Manage group</a>
                     </div>
                 </td>
