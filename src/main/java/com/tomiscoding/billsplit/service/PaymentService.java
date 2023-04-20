@@ -41,9 +41,9 @@ public class PaymentService {
     }
 
     public Payment updatePaymentStatus(Payment payment, String status) throws ValidationException {
-        if (status.equals("pending")){
+        if (status.equals("PAID_PENDING")){
             return editPaymentAsPaid(payment);
-        } else if (status.equals("confirmed")) {
+        } else if (status.equals("PAID_CONFIRMED")) {
             return editPaymentAsConfirmed(payment);
         } else {
             throw new ValidationException(status + " is not a valid status");

@@ -38,9 +38,11 @@ public class SplitGroup {
     private List<GroupMember> groupMembers;
 
     @OneToMany(mappedBy = "splitGroup")
+    @Builder.Default
     private List<Expense> expenses = new ArrayList<>();
 
     @OneToMany(mappedBy = "splitGroup")
+    @Builder.Default
     private List<Payment> payments = new ArrayList<>();
 
     @Transient

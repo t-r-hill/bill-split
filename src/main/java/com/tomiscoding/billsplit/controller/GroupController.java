@@ -4,6 +4,7 @@ import com.tomiscoding.billsplit.exceptions.*;
 import com.tomiscoding.billsplit.model.*;
 import com.tomiscoding.billsplit.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +46,7 @@ public class GroupController {
     }
 
     // Only allow group members to access
+    @PreAuthorize("hasPermission(#id,'splitGroup','user')")
     @GetMapping("/{id}")
     public String showGroupOverview(@PathVariable Long id, Authentication authentication, Model model) throws SplitGroupNotFoundException {
         User user = (User) authentication.getPrincipal();
@@ -58,6 +60,7 @@ public class GroupController {
     }
 
     // Only allow group admin to access
+    @PreAuthorize("hasPermission(#id,'splitGroup','admin')")
     @GetMapping("/{id}/admin")
     public String showGroupAdminOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupWithExpensesMembersPaymentsById(id);
@@ -77,6 +80,7 @@ public class GroupController {
     }
 
     // Only allow group admin to access
+    @PreAuthorize("hasPermission(#id,'splitGroup','admin')")
     @GetMapping("/{id}/invite")
     public String showAddGroupMemberPage(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
@@ -85,6 +89,7 @@ public class GroupController {
     }
 
     // Only allow group admin to access
+    @PreAuthorize("hasPermission(#id,'splitGroup','admin')")
     @PostMapping("/{id}/invite")
     public String sendInviteEmail(@PathVariable Long id,
                                   @RequestParam String emailAddress,
@@ -104,6 +109,7 @@ public class GroupController {
     }
 
     // Only allow group admin to access
+    @PreAuthorize("hasPermission(#id,'splitGroup','admin')")
     @GetMapping("/{id}/calculate")
     public String calculatePayments(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = groupService.getGroupById(id);
@@ -139,6 +145,7 @@ public class GroupController {
     }
 
     // Only allow group admin to access
+    @PreAuthorize("hasPermission(#groupId,'splitGroup','admin')")
     @GetMapping("/{groupId}/user/{userId}")
     public String changeGroupMember(@RequestParam String action,
                                          @PathVariable Long groupId,
@@ -159,7 +166,8 @@ public class GroupController {
     }
 
     // Only allow group member to access
-    @GetMapping("/{id}/expense/new")
+    @PreAuthorize("hasPermission(#splitGroupId,'splitGroup','user')")
+    @GetMapping("/{splitGroupId}/expense/new")
     public String showCreateExpense(@PathVariable Long splitGroupId, Model model) throws SplitGroupNotFoundException {
         Expense expense = new Expense();
         if (splitGroupId != null){
@@ -173,13 +181,14 @@ public class GroupController {
     }
 
     //Only allow group member to access
-    @PostMapping("/{id}/expense/new")
+    @PreAuthorize("hasPermission(#splitGroupId,'splitGroup','user')")
+    @PostMapping("/{splitGroupId}/expense/new")
     public String createNewExpense(@ModelAttribute Expense expense,
                                    @PathVariable Long splitGroupId,
                                    Authentication authentication) throws ValidationException, CurrencyConversionException {
         User user = (User) authentication.getPrincipal();
         expense.setUser(user);
-        expense = expenseService.saveExpense(expense);
+        expenseService.saveExpense(expense);
         return "redirect:/splitGroup/" + splitGroupId;
     }
 }

@@ -14,6 +14,7 @@ import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,6 +50,7 @@ public class ExpenseController {
 //    }
 
     // Only accessed by expense user or group admin
+    @PreAuthorize("hasPermission(#id, 'expense','all')")
     @GetMapping("/{id}/edit")
     public String showEditExpense(@PathVariable Long id, Model model) throws SplitGroupNotFoundException, ExpenseNotFoundException {
         Expense expense = expenseService.getExpense(id);
@@ -59,6 +61,7 @@ public class ExpenseController {
     }
 
     // Only accessed by expense user or group admin
+    @PreAuthorize("hasPermission(#id, 'expense','all')")
     @GetMapping("/{id}/delete")
     public String deleteExpense(@PathVariable Long id) throws ValidationException, ExpenseNotFoundException {
         long splitGroupId = expenseService.getExpense(id).getSplitGroup().getId();
@@ -67,6 +70,7 @@ public class ExpenseController {
     }
 
     // Only accessed by expense user or group admin
+    @PreAuthorize("hasPermission(#id, 'expense','all')")
     @PostMapping("/{id}")
     public String editExpense(@PathVariable Long id, @ModelAttribute Expense expense) throws ValidationException, ExpenseNotFoundException, CurrencyConversionException {
         expense = expenseService.editExpense(id, expense);
@@ -82,6 +86,7 @@ public class ExpenseController {
 //    }
 
     // Only accessed by group member
+    @PreAuthorize("hasPermission(#groupId,'splitGroup','user')")
     @GetMapping("/search")
     public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
@@ -109,6 +114,7 @@ public class ExpenseController {
     }
 
     // Only accessed by group member
+    @PreAuthorize("hasPermission(#filterOptions.splitGroup.id,'splitGroup','user')")
     @PostMapping("/search")
     public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication){
         User activeUser = (User) authentication.getPrincipal();

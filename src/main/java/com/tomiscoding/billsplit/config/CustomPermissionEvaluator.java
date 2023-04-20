@@ -44,7 +44,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         if (targetType.equalsIgnoreCase("expense")){
             try {
-                Expense expense = expenseService.getExpense(Long.getLong(targetId.toString()));
+                Expense expense = expenseService.getExpense(Long.parseLong(targetId.toString()));
                 return activeUser.getId() == expense.getUser().getId() ||
                         groupMemberRepository.existsByUserIdAndSplitGroupIdAndIsAdmin(activeUser.getId(), expense.getSplitGroup().getId(), true);
             } catch (ExpenseNotFoundException e) {
@@ -52,7 +52,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             }
         } else if (targetType.equalsIgnoreCase("splitGroup")) {
             try {
-                SplitGroup splitGroup = groupService.getGroupById(Long.getLong(targetId.toString()));
+                SplitGroup splitGroup = groupService.getGroupById(Long.parseLong(targetId.toString()));
                 if (permission.equals("user")) {
                     return groupMemberRepository.existsByUserAndSplitGroup(activeUser, splitGroup);
                 } else if (permission.equals("admin")) {
@@ -65,11 +65,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             }
         } else if (targetType.equalsIgnoreCase("payment")){
             try {
-                Payment payment = paymentService.getPaymentById(Long.getLong(targetId.toString()));
-                if (permission.equals("pending")){
-                    return activeUser.equals(payment.getFromUser());
-                } else if (permission.equals("confirmed")) {
-                    return activeUser.equals(payment.getToUser());
+                Payment payment = paymentService.getPaymentById(Long.parseLong(targetId.toString()));
+                if (permission.equals("PAID_PENDING")){
+                    return activeUser.getId() == payment.getFromUser().getId();
+                } else if (permission.equals("PAID_CONFIRMED")) {
+                    return activeUser.getId() == payment.getToUser().getId();
                 } else {
                     return false;
                 }

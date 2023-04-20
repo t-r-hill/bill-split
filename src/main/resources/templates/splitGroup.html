@@ -87,8 +87,8 @@
                 <td th:text="${payment.paymentStatus.getFieldDescription()}" scope="col"></td>
                 <td scope="col">
                     <div class="btn-group btn-group-sm">
-                        <a th:if="${payment.paymentStatus.name == 'NOT_PAID' && payment.fromUser.id == __${#authentication.principal.id}__}" class="btn btn-secondary" th:href="@{/payment/{id}/(id=${payment.id},status='pending')}">Pay</a>
-                        <a th:if="${payment.paymentStatus.name == 'PAID_PENDING' && payment.toUser.id == __${#authentication.principal.id}__}" class="btn btn-danger" th:href="@{/payment/{id}/(id=${payment.id},status='confirmed')}">Confirm payment</a>
+                        <a th:if="${payment.paymentStatus.name == 'NOT_PAID' && payment.fromUser.id == __${#authentication.principal.id}__}" class="btn btn-secondary" th:href="@{/payment/{id}/(id=${payment.id},status='PAID_PENDING')}">Pay</a>
+                        <a th:if="${payment.paymentStatus.name == 'PAID_PENDING' && payment.toUser.id == __${#authentication.principal.id}__}" class="btn btn-danger" th:href="@{/payment/{id}/(id=${payment.id},status='PAID_CONFIRMED')}">Confirm payment</a>
                     </div>
                 </td>
             </tr>

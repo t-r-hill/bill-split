@@ -5,6 +5,7 @@ import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ public class PaymentController {
     PaymentService paymentService;
 
     // If status = PAID_PENDING only allow fromUser. If status = PAID_CONFIRMED only allow toUser
+    @PreAuthorize("hasPermission(#id,'payment',#status)")
     @GetMapping("/{id}")
     public String updatePaymentStatus(@PathVariable Long id,
                                       @RequestParam String status) throws PaymentNotFoundException, ValidationException {
