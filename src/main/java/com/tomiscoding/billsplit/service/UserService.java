@@ -6,6 +6,7 @@ import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.AuthorityRepository;
 import com.tomiscoding.billsplit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,20 +16,17 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-/** This is a service class for the user object which implements the loadByUsername() method
+/**
+ * This is a service class for the user object which implements the loadByUsername() method
  *  as well as providing other functionality for registration, login and updating of user profiles
  */
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    AuthorityRepository authorityRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,8 +34,9 @@ public class UserService implements UserDetailsService {
                 new UsernameNotFoundException("Could not find user with username: " + username));
     }
 
-    /** This method first validates the user object passed in as argument - unique, required fields and valid password
-     - before encoding the password and persisting using the user repository
+    /**
+     * This method first validates the user object passed in as argument - unique, required fields and valid password
+     * - before encoding the password and persisting using the user repository
      */
     public User createNewUser(User user) throws ValidationException {
 
@@ -53,8 +52,14 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public List<User> getUsersBySplitGroup(SplitGroup splitGroup){
-        return userRepository.getByGroupMembers_SplitGroup(splitGroup);
+    /**
+     * Returns users belonging to a splitGroup. Will return an empty list if the splitGroup is empty.
+     * Verification that the group exists should be done before calling the method
+     * @param splitGroupId the id of the splitGroup to return users for
+     * @return List
+     */
+    public List<User> getUsersBySplitGroup(Long splitGroupId){
+        return userRepository.getByGroupMembers_SplitGroupId(splitGroupId);
     }
 
     // Helper function to prevent accounts with duplicate usernames

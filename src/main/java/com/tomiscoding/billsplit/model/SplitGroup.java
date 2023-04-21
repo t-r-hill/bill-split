@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +118,7 @@ public class SplitGroup {
     }
 
     @Transient
-    public BigDecimal getAmountOwedByUserId(Long userId){
+    public BigDecimal getOutstandingBalanceByUserId(Long userId){
         return getExpensesNotSplitTotal().divide(BigDecimal.valueOf(groupMembers.size()),2, RoundingMode.HALF_EVEN)
                 .subtract(getExpensesNotSplitTotalByUserId(userId));
     }

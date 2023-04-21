@@ -8,6 +8,7 @@ import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.ExpenseRepository;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.tools.MatchingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,13 +24,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ExpenseService {
 
-    @Autowired
-    ExpenseRepository expenseRepository;
-
-    @Autowired
-    CurrencyConversionService currencyConversionService;
+    private final ExpenseRepository expenseRepository;
+    private final CurrencyConversionService currencyConversionService;
 
     public Expense saveExpense(Expense expense) throws ValidationException, CurrencyConversionException {
         validateExpense(expense);

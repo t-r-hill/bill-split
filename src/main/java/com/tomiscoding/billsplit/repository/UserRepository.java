@@ -13,5 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-    List<User> getByGroupMembers_SplitGroup(SplitGroup splitGroup);
+    List<User> getByGroupMembers_SplitGroupId(Long splitGroupId);
 }

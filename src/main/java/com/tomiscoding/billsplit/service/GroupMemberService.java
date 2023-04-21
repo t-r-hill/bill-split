@@ -8,6 +8,8 @@ import com.tomiscoding.billsplit.model.GroupMember;
 import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.model.PaymentStatus;
 import com.tomiscoding.billsplit.repository.GroupMemberRepository;
+import com.tomiscoding.billsplit.repository.PaymentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +18,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GroupMemberService {
 
-    @Autowired
-    GroupMemberRepository groupMemberRepository;
-
-    @Autowired
-    ExpenseService expenseService;
-
-    @Autowired
-    PaymentService paymentService;
+    private final GroupMemberRepository groupMemberRepository;
+    private final ExpenseService expenseService;
+    private final PaymentRepository paymentRepository;
 
     public GroupMember createGroupMember(GroupMember groupMember) throws ValidationException, DuplicateGroupMemberException {
         validateGroupMember(groupMember);
@@ -70,7 +68,7 @@ public class GroupMemberService {
     }
 
     private void assertGroupMemberHasNoOutstandingPayments(GroupMember groupMember) throws ValidationException {
-        List<Payment> payments = paymentService.getPaymentsBySplitGroupAndUser(groupMember.getSplitGroup(), groupMember.getUser());
+        List<Payment> payments = paymentRepository.getPaymentsBySplitGroupAndUser(groupMember.getSplitGroup(), groupMember.getUser());
         List<Payment> outstandingPayments = payments.stream()
                 .filter(p -> !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
                 .collect(Collectors.toList());

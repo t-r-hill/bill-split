@@ -3,6 +3,7 @@ package com.tomiscoding.billsplit.service;
 import com.tomiscoding.billsplit.dto.CurrencyConversionResponse;
 import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.model.Currency;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CurrencyConversionService {
 
     @Value("${currencyapi.key}")
@@ -24,8 +26,7 @@ public class CurrencyConversionService {
     @Value("${currencyapi.baseUrl}")
     private String currencyAPIUrl;
 
-    @Autowired
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     @Cacheable(value = "currencies", key = "#fromCurrency.name+#toCurrency.name")
     public BigDecimal getCurrencyConversion(Currency fromCurrency, Currency toCurrency) throws CurrencyConversionException {

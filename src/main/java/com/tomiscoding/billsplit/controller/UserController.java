@@ -6,6 +6,7 @@ import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -22,13 +23,11 @@ import java.util.Comparator;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    GroupService groupService;
+    private final UserService userService;
+    private final GroupService groupService;
 
 //    @GetMapping("/login")
 //    public String showLoginPage(Model model){

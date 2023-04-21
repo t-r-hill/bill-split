@@ -25,15 +25,15 @@
                     <th scope="col"></th>
                     <th scope="col">Group Expenses</th>
                     <th scope="col">Your Expenses</th>
-                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Owed by you' : 'Due to you'" scope="col">Amount you owe</th>
+                    <th th:text="${groupOverview.currentUserBalance.signum()} > 0 ? 'Owed by you' : 'Due to you'" scope="col">Amount you owe</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
-                    <td th:text="${splitGroup.getExpensesNotSplitTotal()}">Total expenses</td>
-                    <td th:text="${splitGroup.getExpensesNotSplitTotalByUserId(__${#authentication.principal.id}__)}">Your expenses</td>
-                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).abs()}">Amount owed</td>
+                    <td th:text="${groupOverview.currentGroupExpenses}">Total expenses</td>
+                    <td th:text="${groupOverview.currentUserExpenses}">Your expenses</td>
+                    <td th:text="${groupOverview.currentUserBalance.abs()}">Amount owed</td>
                 </tr>
                 </tbody>
             </table>
@@ -46,29 +46,29 @@
                     <th scope="col"></th>
                     <th scope="col">Group Expenses</th>
                     <th scope="col">Your Expenses</th>
-                    <th th:text="${splitGroup.getConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Payment to you' : 'Payment by you'" scope="col">Paid to you</th>
-                    <th th:text="${splitGroup.getNotConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Pending payment to you' : 'Pending payment by you'" scope="col">Pending paid to you</th>
+                    <th th:text="${groupOverview.confirmedUserPayments.signum()} > 0 ? 'Payment to you' : 'Payment by you'" scope="col">Paid to you</th>
+                    <th th:text="${groupOverview.notConfirmedUserPayments.signum()} > 0 ? 'Pending payment to you' : 'Pending payment by you'" scope="col">Pending paid to you</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
-                    <td th:text="${splitGroup.getExpensesTotal()}">Total expenses</td>
-                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Total expenses</td>
-                    <td th:text="${splitGroup.getConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).abs()}">Paid to you</td>
-                    <td th:text="${splitGroup.getNotConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).abs()}">Pending paid to you</td>
+                    <td th:text="${groupOverview.totalGroupExpenses}">Total expenses</td>
+                    <td th:text="${groupOverview.totalUserExpenses}">Total expenses</td>
+                    <td th:text="${groupOverview.confirmedUserPayments.abs()}">Paid to you</td>
+                    <td th:text="${groupOverview.notConfirmedUserPayments.abs()}">Pending paid to you</td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div th:if="${!payments.isEmpty()}" class="row justify-content-between">
+    <div th:if="${!groupOverview.userPayments.isEmpty()}" class="row justify-content-between">
         <div class="col">
-            <h4>Payments</h4>
+            <h4>Unconfirmed Payments</h4>
         </div>
     </div>
     <!-- Group payments table - can this be collapsible-->
-    <div th:if="${!payments.isEmpty()}" class="row mb-20" align="center">
+    <div th:if="${!groupOverview.userPayments.isEmpty()}" class="row mb-20" align="center">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -80,7 +80,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="payment:${payments}">
+            <tr th:each="payment:${groupOverview.userPayments}">
                 <td th:text="${payment.fromUser.fullName}" scope="col"></td>
                 <td th:text="${payment.toUser.fullName}" scope="col"></td>
                 <td th:text="${payment.amount}" scope="col"></td>
@@ -97,7 +97,7 @@
     </div>
     <div class="row justify-content-between">
         <div class="col">
-            <h4>Expenses</h4>
+            <h4>Recent Expenses</h4>
         </div>
         <div class="col-auto">
             <div class="btn-group btn-group-md">
@@ -122,7 +122,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="expense:${splitGroup.expenses}">
+            <tr th:each="expense:${groupOverview.recentExpenses}">
                 <td th:text="${expense.user.fullName}" scope="col"></td>
                 <td th:text="${expense.expenseDate}" scope="col"></td>
                 <td th:text="${expense.name}" scope="col"></td>
@@ -158,7 +158,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="member:${users}">
+            <tr th:each="member:${groupOverview.groupMemberUsers}">
                 <td th:text="${member.fullName}" scope="col">Name</td>
                 <td th:text="${member.username}" scope="col">Email</td>
             </tr>

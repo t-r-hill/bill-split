@@ -1,8 +1,10 @@
 package com.tomiscoding.billsplit.controller;
 
+import com.tomiscoding.billsplit.dto.GroupOverview;
 import com.tomiscoding.billsplit.exceptions.*;
 import com.tomiscoding.billsplit.model.*;
 import com.tomiscoding.billsplit.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -14,28 +16,19 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/splitGroup")
+@RequiredArgsConstructor
 public class GroupController {
 
-    @Autowired
-    GroupService groupService;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    PaymentService paymentService;
-
-    @Autowired
-    GroupMemberService groupMemberService;
-
-    @Autowired
-    MailerSendService mailerSendService;
-
-    @Autowired
-    ExpenseService expenseService;
+    private final GroupService groupService;
+    private final UserService userService;
+    private final PaymentService paymentService;
+    private final GroupMemberService groupMemberService;
+    private final MailerSendService mailerSendService;
+    private final ExpenseService expenseService;
 
     @GetMapping
     public String showGroupsOfUser(Authentication authentication, Model model){
@@ -50,12 +43,11 @@ public class GroupController {
     @GetMapping("/{id}")
     public String showGroupOverview(@PathVariable Long id, Authentication authentication, Model model) throws SplitGroupNotFoundException {
         User user = (User) authentication.getPrincipal();
-        SplitGroup splitGroup = groupService.getGroupWithExpensesMembersPaymentsById(id);
-        List<User> users = userService.getUsersBySplitGroup(splitGroup);
-        List<Payment> payments = paymentService.getPaymentsBySplitGroupAndUser(splitGroup, user);
-        model.addAttribute("payments", payments);
+        SplitGroup splitGroup = groupService.getGroupById(id);
+        GroupOverview groupOverview = groupService.generateGroupOverview(id, user.getId());
+
         model.addAttribute("splitGroup", splitGroup);
-        model.addAttribute("users", users);
+        model.addAttribute("groupOverview", groupOverview);
         return "splitGroup";
     }
 
@@ -63,10 +55,11 @@ public class GroupController {
     @PreAuthorize("hasPermission(#id,'splitGroup','admin')")
     @GetMapping("/{id}/admin")
     public String showGroupAdminOverview(@PathVariable Long id, Model model) throws SplitGroupNotFoundException {
-        SplitGroup splitGroup = groupService.getGroupWithExpensesMembersPaymentsById(id);
-        List<User> users = userService.getUsersBySplitGroup(splitGroup);
+        GroupOverview groupOverview = groupService.generateAdminGroupOverview(id);
+        SplitGroup splitGroup = groupService.getGroupById(id);
+
+        model.addAttribute("groupOverview", groupOverview);
         model.addAttribute("splitGroup", splitGroup);
-        model.addAttribute("users", users);
         return "splitGroup-admin";
     }
 

@@ -4,6 +4,7 @@ import com.tomiscoding.billsplit.exceptions.PaymentNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/payment")
+@RequiredArgsConstructor
 public class PaymentController {
 
-    @Autowired
-    PaymentService paymentService;
+    private final PaymentService paymentService;
 
     // If status = PAID_PENDING only allow fromUser. If status = PAID_CONFIRMED only allow toUser
     @PreAuthorize("hasPermission(#id,'payment',#status)")

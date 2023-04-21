@@ -11,6 +11,7 @@ import com.tomiscoding.billsplit.repository.GroupMemberRepository;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -19,19 +20,14 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 
 @Component
+@RequiredArgsConstructor
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
-    @Autowired
-    ExpenseService expenseService;
-    
-    @Autowired
-    GroupMemberRepository groupMemberRepository;
 
-    @Autowired
-    GroupService groupService;
-
-    @Autowired
-    PaymentService paymentService;
+    private final ExpenseService expenseService;
+    private final GroupMemberRepository groupMemberRepository;
+    private final GroupService groupService;
+    private final PaymentService paymentService;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {

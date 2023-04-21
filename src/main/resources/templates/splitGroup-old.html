@@ -11,11 +11,6 @@
         <div class="col">
             <h3 th:text="${splitGroup.groupName}">Your group</h3>
         </div>
-        <div class="col-auto">
-            <div class="btn-group btn-group-md">
-                <a th:href="@{/splitGroup/{id}/calculate(id=${splitGroup.id})}" class="btn btn-primary btn-small">Calculate payments</a>
-            </div>
-        </div>
     </div>
     <div class="row">
         <h5 th:text="${splitGroup.groupDescription}">Your group description</h5>
@@ -29,12 +24,16 @@
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">Group Expenses</th>
+                    <th scope="col">Your Expenses</th>
+                    <th th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Owed by you' : 'Due to you'" scope="col">Amount you owe</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
-                    <td th:text="${groupOverview.currentGroupExpenses}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesNotSplitTotal()}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesNotSplitTotalByUserId(__${#authentication.principal.id}__)}">Your expenses</td>
+                    <td th:text="${splitGroup.getAmountOwedByUserId(__${#authentication.principal.id}__).abs()}">Amount owed</td>
                 </tr>
                 </tbody>
             </table>
@@ -46,24 +45,30 @@
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">Group Expenses</th>
+                    <th scope="col">Your Expenses</th>
+                    <th th:text="${splitGroup.getConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Payment to you' : 'Payment by you'" scope="col">Paid to you</th>
+                    <th th:text="${splitGroup.getNotConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).signum()} > 0 ? 'Pending payment to you' : 'Pending payment by you'" scope="col">Pending paid to you</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td th:text="${splitGroup.baseCurrency}">Group currency</td>
-                    <td th:text="${groupOverview.totalGroupExpenses}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesTotal()}">Total expenses</td>
+                    <td th:text="${splitGroup.getExpensesTotalByUserId(__${#authentication.principal.id}__)}">Total expenses</td>
+                    <td th:text="${splitGroup.getConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).abs()}">Paid to you</td>
+                    <td th:text="${splitGroup.getNotConfirmedPaymentsTotalForUserId(__${#authentication.principal.id}__).abs()}">Pending paid to you</td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div th:if="${!groupOverview.userPayments.isEmpty()}" class="row justify-content-between">
+    <div th:if="${!payments.isEmpty()}" class="row justify-content-between">
         <div class="col">
-            <h4>Outstanding Payments (Not confirmed)</h4>
+            <h4>Payments</h4>
         </div>
     </div>
     <!-- Group payments table - can this be collapsible-->
-    <div th:if="${!groupOverview.userPayments.isEmpty()}" class="row mb-20" align="center">
+    <div th:if="${!payments.isEmpty()}" class="row mb-20" align="center">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -71,21 +76,28 @@
                 <th scope="col">To</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Status</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="payment:${groupOverview.userPayments}">
+            <tr th:each="payment:${payments}">
                 <td th:text="${payment.fromUser.fullName}" scope="col"></td>
                 <td th:text="${payment.toUser.fullName}" scope="col"></td>
                 <td th:text="${payment.amount}" scope="col"></td>
                 <td th:text="${payment.paymentStatus.getFieldDescription()}" scope="col"></td>
+                <td scope="col">
+                    <div class="btn-group btn-group-sm">
+                        <a th:if="${payment.paymentStatus.name == 'NOT_PAID' && payment.fromUser.id == __${#authentication.principal.id}__}" class="btn btn-secondary" th:href="@{/payment/{id}/(id=${payment.id},status='PAID_PENDING')}">Pay</a>
+                        <a th:if="${payment.paymentStatus.name == 'PAID_PENDING' && payment.toUser.id == __${#authentication.principal.id}__}" class="btn btn-danger" th:href="@{/payment/{id}/(id=${payment.id},status='PAID_CONFIRMED')}">Confirm payment</a>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class="row justify-content-between">
         <div class="col">
-            <h4>Current Expenses (Not split)</h4>
+            <h4>Expenses</h4>
         </div>
         <div class="col-auto">
             <div class="btn-group btn-group-md">
@@ -103,24 +115,26 @@
                 <th scope="col">Date</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Amount</th>
+                <th scope="col">Converted Amount</th>
                 <th scope="col">Currency</th>
+                <th scope="col">Original Amount</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="expense:${groupOverview.recentExpenses}">
+            <tr th:each="expense:${splitGroup.expenses}">
                 <td th:text="${expense.user.fullName}" scope="col"></td>
                 <td th:text="${expense.expenseDate}" scope="col"></td>
                 <td th:text="${expense.name}" scope="col"></td>
                 <td th:text="${expense.expenseDescription}" scope="col"></td>
                 <td th:text="${expense.amount}" scope="col"></td>
                 <td th:text="${expense.currency}" scope="col"></td>
+                <td th:text="${expense.currencyAmount}" scope="col"></td>
                 <td scope="col">
                     <div th:if="${expense.isSplit}" class="btn-group btn-group-sm">
                         <span>Settled</span>
                     </div>
-                    <div th:unless="${expense.isSplit}" class="btn-group btn-group-sm">
+                    <div th:if="${!expense.isSplit && expense.user.id == __${#authentication.principal.id}__}" class="btn-group btn-group-sm">
                         <a class="btn btn-secondary" th:href="@{/expense/{id}/edit(id=${expense.id})}">Edit</a>
                         <a class="btn btn-danger" th:href="@{/expense/{id}/delete(id=${expense.id})}">Delete</a>
                     </div>
@@ -130,13 +144,8 @@
         </table>
     </div>
     <div class="row justify-content-between">
-        <div class="col">
-            <h4>Group members</h4>
-        </div>
         <div class="col-auto">
-            <div class="btn-group btn-group-md">
-                <a th:href="@{/splitGroup/{id}/invite(id=${splitGroup.id})}" class="btn btn-primary btn-small mx-1">Add member</a>
-            </div>
+            <h4>Group members</h4>
         </div>
     </div>
     <!-- Group members table - can this be collapsible-->
@@ -146,22 +155,12 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
-                <th scope="col">Is Admin</th>
-                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="member:${splitGroup.groupMembers}">
-                <td th:text="${member.user.fullName}" scope="col">Name</td>
-                <td th:text="${member.user.username}" scope="col">Email</td>
-                <td th:text="${member.isAdmin} ? 'Admin' : 'No'" scope="col">Is Admin</td>
-                <td scope="col">
-                    <div class="btn-group btn-group-sm">
-                        <a th:unless="${member.isAdmin}" class="btn btn-secondary" th:href="@{/splitGroup/{id}/user/{user_id}(id=${splitGroup.id},user_id=${member.user.id},action='add_admin')}">Add admin</a>
-                        <a th:if="${member.isAdmin}" class="btn btn-secondary" th:href="@{/splitGroup/{id}/user/{user_id}(id=${splitGroup.id},user_id=${member.user.id},action='remove_admin')}">Remove admin</a>
-                        <a class="btn btn-danger" th:href="@{/splitGroup/{id}/user/{user_id}(id=${splitGroup.id},user_id=${member.user.id},action='remove')}">Remove user</a>
-                    </div>
-                </td>
+            <tr th:each="member:${users}">
+                <td th:text="${member.fullName}" scope="col">Name</td>
+                <td th:text="${member.username}" scope="col">Email</td>
             </tr>
             </tbody>
         </table>

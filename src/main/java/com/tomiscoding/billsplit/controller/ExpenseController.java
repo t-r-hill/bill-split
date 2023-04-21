@@ -12,6 +12,7 @@ import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.SearchService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,17 +25,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/expense")
 public class ExpenseController {
 
-    @Autowired
-    ExpenseService expenseService;
 
-    @Autowired
-    GroupService groupService;
-
-    @Autowired
-    SearchService searchService;
+    private final ExpenseService expenseService;
+    private final GroupService groupService;
+    private final SearchService searchService;
 
 //    @GetMapping("/new")
 //    public String showCreateExpense(@RequestParam Long splitGroupId, Model model) throws SplitGroupNotFoundException {

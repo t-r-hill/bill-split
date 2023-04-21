@@ -1,27 +1,24 @@
 package com.tomiscoding.billsplit.service;
 
+import com.tomiscoding.billsplit.dto.GroupOverview;
 import com.tomiscoding.billsplit.exceptions.DuplicateGroupMemberException;
 import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.*;
 import com.tomiscoding.billsplit.repository.GroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService {
 
-    @Autowired
-    GroupRepository groupRepository;
-
-    @Autowired
-    GroupMemberService groupMemberService;
-
-    @Autowired
-    UserService userService;
+    private final GroupRepository groupRepository;
+    private final GroupMemberService groupMemberService;
 
     @Transactional
     public SplitGroup createGroup(SplitGroup splitGroup, User user) throws ValidationException{
@@ -101,6 +98,60 @@ public class GroupService {
 
     public List<SplitGroup> getGroupsWithGroupMembersByUser(User user){
         return groupRepository.getSplitGroupWithGroupMembersByGroupMembers_User(user);
+    }
+
+    public GroupOverview generateGroupOverview(Long splitGroupId, Long userId) throws SplitGroupNotFoundException {
+        SplitGroup splitGroup = getGroupWithExpensesMembersPaymentsById(splitGroupId);
+
+        List<User> users = splitGroup.getGroupMembers().stream()
+                .map(GroupMember::getUser)
+                .collect(Collectors.toList());
+
+        List<Payment> payments = splitGroup.getPayments().stream()
+                .filter(p -> p.getToUser().getId() == userId
+                        || p .getFromUser().getId() == userId)
+                .filter(p -> !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                .collect(Collectors.toList());
+
+        List<Expense> expenses = splitGroup.getExpenses().stream()
+                .sorted((e1,e2) -> e2.getExpenseDate().compareTo(e1.getExpenseDate()))
+                .limit(10)
+                .collect(Collectors.toList());
+
+        return GroupOverview.builder()
+                .userId(userId)
+                .currentGroupExpenses(splitGroup.getExpensesNotSplitTotal())
+                .currentUserExpenses(splitGroup.getExpensesNotSplitTotalByUserId(userId))
+                .currentUserBalance(splitGroup.getOutstandingBalanceByUserId(userId))
+                .totalGroupExpenses(splitGroup.getExpensesTotal())
+                .totalUserExpenses(splitGroup.getExpensesTotalByUserId(userId))
+                .confirmedUserPayments(splitGroup.getConfirmedPaymentsTotalForUserId(userId))
+                .notConfirmedUserPayments(splitGroup.getNotConfirmedPaymentsTotalForUserId(userId))
+                .userPayments(payments)
+                .recentExpenses(expenses)
+                .groupMemberUsers(users)
+                .build();
+    }
+
+    public GroupOverview generateAdminGroupOverview(Long splitGroupId) throws SplitGroupNotFoundException {
+        SplitGroup splitGroup = getGroupWithExpensesMembersPaymentsById(splitGroupId);
+
+        List<Payment> payments = splitGroup.getPayments().stream()
+                .filter(p -> !p.getPaymentStatus().equals(PaymentStatus.PAID_CONFIRMED))
+                .collect(Collectors.toList());
+
+        List<Expense> expenses = splitGroup.getExpenses().stream()
+                .filter(e -> !e.isSplit())
+                .sorted((e1,e2) -> e2.getExpenseDate().compareTo(e1.getExpenseDate()))
+                .limit(10)
+                .collect(Collectors.toList());
+
+        return GroupOverview.builder()
+                .currentGroupExpenses(splitGroup.getExpensesNotSplitTotal())
+                .totalGroupExpenses(splitGroup.getExpensesTotal())
+                .userPayments(payments)
+                .recentExpenses(expenses)
+                .build();
     }
 
     // Helper function to generate a random code to externally identify the group
