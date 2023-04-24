@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{fragments/layout}" th:with="activeTab='splitGroups'">
+      layout:decorate="~{fragments/layout}" th:with="activeTab='expenses'">
 <head>
     <title>Expense Search</title>
 </head>
@@ -19,13 +19,14 @@
                 <div class="col mr-20">
                     <select class="form-select" th:field="*{splitGroup}" onChange="this.form.submit()">
                         <option th:if="*{splitGroups.isEmpty()}" th:value="null">No Groups Available</option>
+                        <option th:if="${!filterOptions.splitGroups.isEmpty() && filterOptions.splitGroup == null}" th:value="null">Select group</option>
                         <option th:each="eachSplitGroup: *{splitGroups}" th:value="${eachSplitGroup.id}" th:text="${eachSplitGroup.groupName}">Group list</option>
                     </select>
                 </div>
                 <label class="col" th:for="*{user}">User Name</label>
                 <div class="col mr-20">
                     <select class="form-select" th:field="*{user}" onChange="this.form.submit()">
-                        <option th:if="*{users.isEmpty()}" th:value="null">No Groups Available</option>
+                        <option th:if="*{users.isEmpty()}" th:value="null">No Users Available</option>
                         <option th:unless="*{users.isEmpty()}" th:value="null">All users</option>
                         <option th:each="eachUser: *{users}" th:value="${eachUser.id}" th:text="${eachUser.fullName}">Group list</option>
                     </select>

@@ -28,6 +28,13 @@ public class CurrencyConversionService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Queries the currencyapi using RestTemplate to obtain currency conversion rate for supplied curencies
+     * @param fromCurrency
+     * @param toCurrency
+     * @return
+     * @throws CurrencyConversionException
+     */
     @Cacheable(value = "currencies", key = "#fromCurrency.name+#toCurrency.name")
     public BigDecimal getCurrencyConversion(Currency fromCurrency, Currency toCurrency) throws CurrencyConversionException {
 //        // Set http request headers with apikey

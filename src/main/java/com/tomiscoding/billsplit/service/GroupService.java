@@ -8,11 +8,14 @@ import com.tomiscoding.billsplit.model.*;
 import com.tomiscoding.billsplit.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Handles CRUD operations for SplitGroup objects, as well as handling joining groups by invite code and
+ * generating the overview DTOs for displaying split groups to users.
+ */
 @Service
 @RequiredArgsConstructor
 public class GroupService {
@@ -20,6 +23,14 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberService groupMemberService;
 
+    /**
+     * Creates a splitGroup and in the process, generates an invitation code for the group using generateCode() and
+     * creates a group member and sets them as admin. Will revert if group member cannot be added
+     * @param splitGroup the group to be created
+     * @param user the user to be added as group admin
+     * @return the saved splitGroup with group member admin
+     * @throws ValidationException
+     */
     @Transactional
     public SplitGroup createGroup(SplitGroup splitGroup, User user) throws ValidationException{
 
@@ -50,6 +61,12 @@ public class GroupService {
         );
     }
 
+    /**
+     *
+     * @param id the id of the group to load
+     * @return A splitGroup with expenses, members and payments loaded by Hibernate
+     * @throws SplitGroupNotFoundException
+     */
     public SplitGroup getGroupWithExpensesMembersPaymentsById(Long id) throws SplitGroupNotFoundException {
         SplitGroup group = groupRepository.getSplitGroupWithExpensesById(id).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
@@ -66,18 +83,14 @@ public class GroupService {
         return group;
     }
 
-    public SplitGroup getGroupWithExpensesMembersById(Long id) throws SplitGroupNotFoundException {
-        SplitGroup group = groupRepository.getSplitGroupWithExpensesById(id).orElseThrow(
-                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
-        );
-
-        group = groupRepository.getSplitGroupWithGroupMembersById(id).orElseThrow(
-                () -> new SplitGroupNotFoundException("Could not find group with id: " + id)
-        );
-
-        return group;
-    }
-
+    /**
+     * Creates and saves a group member and thus adding a user to a group.
+     * @param user the user to be added to a group
+     * @param inviteCode the invite code for the group to be joined
+     * @throws SplitGroupNotFoundException
+     * @throws ValidationException
+     * @throws DuplicateGroupMemberException
+     */
     public void addUserToGroupByInviteCode(User user, String inviteCode) throws SplitGroupNotFoundException, ValidationException, DuplicateGroupMemberException {
         SplitGroup splitGroup = groupRepository.findByInviteCode(inviteCode).orElseThrow(
                 () -> new SplitGroupNotFoundException("Could not find group with invite code: " + inviteCode)
@@ -96,10 +109,14 @@ public class GroupService {
         return groupRepository.getByGroupMembers_User(user);
     }
 
-    public List<SplitGroup> getGroupsWithGroupMembersByUser(User user){
-        return groupRepository.getSplitGroupWithGroupMembersByGroupMembers_User(user);
-    }
-
+    /**
+     * Filters users, payments and expenses and calculates expense and payment balances and totals to be displyed
+     * to the user in a group overview
+     * @param splitGroupId the group to generate a GroupOverview for
+     * @param userId the user to generate the GroupOverview for
+     * @return GroupOverview
+     * @throws SplitGroupNotFoundException
+     */
     public GroupOverview generateGroupOverview(Long splitGroupId, Long userId) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = getGroupWithExpensesMembersPaymentsById(splitGroupId);
 
@@ -133,6 +150,13 @@ public class GroupService {
                 .build();
     }
 
+    /**
+     * Filters users, payments and expenses and calculates expense and payment balances and totals to be displayed
+     * to the user in a group overview
+     * @param splitGroupId the group to generate a GroupOverview for
+     * @return GroupOverview
+     * @throws SplitGroupNotFoundException
+     */
     public GroupOverview generateAdminGroupOverview(Long splitGroupId) throws SplitGroupNotFoundException {
         SplitGroup splitGroup = getGroupWithExpensesMembersPaymentsById(splitGroupId);
 

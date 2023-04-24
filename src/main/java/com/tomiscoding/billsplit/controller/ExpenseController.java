@@ -1,10 +1,7 @@
 package com.tomiscoding.billsplit.controller;
 
 import com.tomiscoding.billsplit.dto.ExpenseSearchFilter;
-import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
-import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
-import com.tomiscoding.billsplit.exceptions.SplitGroupNotFoundException;
-import com.tomiscoding.billsplit.exceptions.ValidationException;
+import com.tomiscoding.billsplit.exceptions.*;
 import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
@@ -22,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -33,19 +31,6 @@ public class ExpenseController {
     private final ExpenseService expenseService;
     private final GroupService groupService;
     private final SearchService searchService;
-
-//    @GetMapping("/new")
-//    public String showCreateExpense(@RequestParam Long splitGroupId, Model model) throws SplitGroupNotFoundException {
-//        Expense expense = new Expense();
-//        if (splitGroupId != null){
-//            expense.setSplitGroup(groupService.getGroupById(splitGroupId));
-//        }
-//        expense.setExpenseDate(LocalDate.now());
-//        List<Currency> currencies = List.of(Currency.values());
-//        model.addAttribute("currencies", currencies);
-//        model.addAttribute("expense", expense);
-//        return "expense-new";
-//    }
 
     // Only accessed by expense user or group admin
     @PreAuthorize("hasPermission(#id, 'expense','all')")
@@ -75,38 +60,37 @@ public class ExpenseController {
         return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
     }
 
-//    @PostMapping
-//    public String createNewExpense(@ModelAttribute Expense expense, Authentication authentication) throws ValidationException, CurrencyConversionException {
-//        User user = (User) authentication.getPrincipal();
-//        expense.setUser(user);
-//        expense = expenseService.saveExpense(expense);
-//        return "redirect:/splitGroup/" + expense.getSplitGroup().getId();
-//    }
-
     // Only accessed by group member
     @PreAuthorize("hasPermission(#groupId,'splitGroup','user')")
     @GetMapping("/search")
-    public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException {
+    public String showExpenseSearch(@RequestParam(required = false, defaultValue = "0") Long groupId ,Model model, Authentication authentication) throws SplitGroupNotFoundException, SplitGroupListNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
         ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
         expenseSearchFilter.setUser(null);
         expenseSearchFilter.setCurrentPageNum(0);
+        expenseSearchFilter.setNumPages(1);
         expenseSearchFilter.setIsSplit(true);
 
-        Page<Expense> expenses;
-        if (groupId != 0){
-            SplitGroup splitGroup = groupService.getGroupById(groupId);
-            expenseSearchFilter.setSplitGroup(splitGroup);
+        SplitGroup splitGroup;
+
+        if (groupId == 0){
+            splitGroup = expenseSearchFilter.getSplitGroups().isEmpty() ? null : expenseSearchFilter.getSplitGroups().get(0);
+        } else{
+            splitGroup = groupService.getGroupById(groupId);
         }
-        // Get search results and add to model
-        expenses = expenseService.getExpenseBySplitGroupIdAndIsSplit(
-                    expenseSearchFilter.getSplitGroup().getId(),
-                    expenseSearchFilter.getIsSplit(),
-                    expenseSearchFilter.getCurrentPageNum());
-        expenseSearchFilter.setNumPages(expenses.getTotalPages());
+
+        expenseSearchFilter.setSplitGroup(splitGroup);
+
+        Page<Expense> expensesPage = expenseService.getExpenseBySplitGroupIdAndIsSplit(
+                expenseSearchFilter.getSplitGroup().getId(),
+                expenseSearchFilter.getIsSplit(),
+                expenseSearchFilter.getCurrentPageNum());
+
+        expenseSearchFilter.setNumPages(expensesPage.getTotalPages());
+        List<Expense> expenses = expensesPage.getContent();
 
         model.addAttribute("filterOptions", expenseSearchFilter);
-        model.addAttribute("expenses", expenses.getContent());
+        model.addAttribute("expenses", expenses);
 
         return "expense-search";
     }
@@ -114,11 +98,10 @@ public class ExpenseController {
     // Only accessed by group member
     @PreAuthorize("hasPermission(#filterOptions.splitGroup.id,'splitGroup','user')")
     @PostMapping("/search")
-    public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication){
+    public String updateExpenseSearch(@ModelAttribute ExpenseSearchFilter filterOptions ,Model model, Authentication authentication) throws SplitGroupListNotFoundException {
         User activeUser = (User) authentication.getPrincipal();
         Integer pageNum = filterOptions.getSelectedPageNum() == null ? 0 : filterOptions.getSelectedPageNum();
 
-        // Maybe need to dynamically update the filterOptions so that selected values are pre-populated and options are responsively updated
         ExpenseSearchFilter expenseSearchFilter = searchService.populateExpenseSearchOptions(activeUser);
         expenseSearchFilter.setUser(filterOptions.getUser());
         expenseSearchFilter.setSplitGroup(filterOptions.getSplitGroup());
@@ -126,23 +109,25 @@ public class ExpenseController {
         expenseSearchFilter.setCurrentPageNum(pageNum);
 
         // Get search results and add to model
-        Page<Expense> expenses;
+
+        Page<Expense> expensesPage;
         if (filterOptions.getUser() == null){
-            expenses = expenseService.getExpenseBySplitGroupIdAndIsSplit(
+            expensesPage = expenseService.getExpenseBySplitGroupIdAndIsSplit(
                     expenseSearchFilter.getSplitGroup().getId(),
                     expenseSearchFilter.getIsSplit(),
                     expenseSearchFilter.getCurrentPageNum());
         } else {
-            expenses = expenseService.getExpenseByUserIdAndSplitGroupIdAndIsSplit(
+            expensesPage = expenseService.getExpenseByUserIdAndSplitGroupIdAndIsSplit(
                     expenseSearchFilter.getUser().getId(),
                     expenseSearchFilter.getSplitGroup().getId(),
                     expenseSearchFilter.getIsSplit(),
                     expenseSearchFilter.getCurrentPageNum());
         }
-        expenseSearchFilter.setNumPages(expenses.getTotalPages());
+        expenseSearchFilter.setNumPages(expensesPage.getTotalPages());
+        List<Expense> expenses = expensesPage.getContent();
 
         model.addAttribute("filterOptions", expenseSearchFilter);
-        model.addAttribute("expenses", expenses.getContent());
+        model.addAttribute("expenses", expenses);
 
         return "expense-search";
     }

@@ -6,19 +6,13 @@ import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.SplitGroup;
-import com.tomiscoding.billsplit.model.User;
 import com.tomiscoding.billsplit.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.tools.MatchingContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +24,13 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final CurrencyConversionService currencyConversionService;
 
+    /**
+     * First validates an expense object, ensures correct scale of BigDecimal and converts currency before persisting
+     * @param expense to be persisted
+     * @return persisted expense object
+     * @throws ValidationException
+     * @throws CurrencyConversionException
+     */
     public Expense saveExpense(Expense expense) throws ValidationException, CurrencyConversionException {
         validateExpense(expense);
         expense.setCurrencyAmount(expense.getCurrencyAmount().setScale(2, RoundingMode.HALF_EVEN));
@@ -44,6 +45,14 @@ public class ExpenseService {
         );
     }
 
+    /**
+     * @param id of the expense which is being updated
+     * @param expense to be updated
+     * @return the expense which has been updated
+     * @throws ExpenseNotFoundException if the expense with id does not exist
+     * @throws ValidationException if the expense being updated has isSplit == true
+     * @throws CurrencyConversionException
+     */
     public Expense editExpense(Long id, Expense expense) throws ExpenseNotFoundException, ValidationException, CurrencyConversionException {
         Expense expense1 = getExpense(id);
         if (expense1.isSplit()){
@@ -57,6 +66,11 @@ public class ExpenseService {
         return saveExpense(expense);
     }
 
+    /**
+     * @param id of the expense to be deleted
+     * @throws ExpenseNotFoundException if an expense with the id does not exist
+     * @throws ValidationException if the expense has isSplit == true
+     */
     public void deleteExpense(Long id) throws ExpenseNotFoundException, ValidationException {
         Expense expense = getExpense(id);
         if (expense.isSplit()){
@@ -65,6 +79,9 @@ public class ExpenseService {
         expenseRepository.delete(expense);
     }
 
+    /**
+     * @param expenses a list of expenses to be deleted
+     */
     public void deleteExpensesList(List<Expense> expenses){
         expenses = expenses.stream()
                 .filter(e -> !e.isSplit())
@@ -73,8 +90,15 @@ public class ExpenseService {
         expenseRepository.deleteAllInBatch(expenses);
     }
 
+    /**
+     * @param splitGroup containing the expenses which are to be split
+     * @return a list of the updated expenses
+     */
     public List<Expense> setExpensesAsSplitByGroup(SplitGroup splitGroup){
-        List<Expense> expenses = splitGroup.getExpenses();
+        List<Expense> expenses = splitGroup.getExpenses().stream()
+                .filter(e -> !e.isSplit())
+                .collect(Collectors.toList());
+
         expenses.forEach(e -> e.setSplit(true));
         return expenseRepository.saveAll(expenses);
     }
@@ -84,15 +108,22 @@ public class ExpenseService {
     }
 
     public Page<Expense> getExpenseByUserIdAndSplitGroupIdAndIsSplit(Long userId, Long splitGroupId, Boolean isSplit, Integer pageNum){
-        PageRequest pageRequest = PageRequest.of(pageNum, 3).withSort(Sort.Direction.DESC,"expenseDate");
+        PageRequest pageRequest = PageRequest.of(pageNum, 10).withSort(Sort.Direction.DESC,"expenseDate");
         return expenseRepository.getExpensesByUserIdAndSplitGroupIdAndIsSplit(userId, splitGroupId, isSplit, pageRequest);
     }
 
     public Page<Expense> getExpenseBySplitGroupIdAndIsSplit(Long splitGroupId, Boolean isSplit, Integer pageNum){
-        PageRequest pageRequest = PageRequest.of(pageNum, 3).withSort(Sort.Direction.DESC,"expenseDate");
+        PageRequest pageRequest = PageRequest.of(pageNum, 10).withSort(Sort.Direction.DESC,"expenseDate");
         return expenseRepository.getExpensesBySplitGroupIdAndIsSplit(splitGroupId, isSplit, pageRequest);
     }
 
+    /**
+     * Retrieves currency conversion rate with getCurrencyConversion() and converts amount of expense with correct
+     * and rounding of BigDecimal
+     * @param expense expense with amount to be converted
+     * @return BigDecimal with the converted amount
+     * @throws CurrencyConversionException
+     */
     private BigDecimal convertExpenseAmount(Expense expense) throws CurrencyConversionException {
         Currency fromCurrency = expense.getCurrency();
         Currency toCurrency = expense.getSplitGroup().getBaseCurrency();

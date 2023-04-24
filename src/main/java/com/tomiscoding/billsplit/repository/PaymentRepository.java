@@ -1,6 +1,7 @@
 package com.tomiscoding.billsplit.repository;
 
 import com.tomiscoding.billsplit.model.Payment;
+import com.tomiscoding.billsplit.model.PaymentStatus;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             "AND (p.fromUser = :user OR p.toUser = :user)")
     List<Payment> getPaymentsBySplitGroupAndUser(@Param("splitGroup") SplitGroup splitGroup,
                                                  @Param("user") User user);
+
+    List<Payment> getBySplitGroupId(Long splitGroupId);
+
+
+
 }
