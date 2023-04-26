@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="${pageName}">Error</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="container">
+        <p th:text="${message}">Error message</p>
+        <p th:text="${detail}">Error detail</p>
+        <a class="btn btn-primary btn-small" th:text="${redirectText}" th:href="@{/{redirectPath}(redirectPath=${redirectPath})}">Return</a>
+    </div>
+</div>
+</body>
+</html>

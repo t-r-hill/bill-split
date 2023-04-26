@@ -28,7 +28,7 @@ public class GroupMemberService {
      * @param groupMember to be persisted
      * @return GroupMember which has been saved
      * @throws ValidationException if group member fields not correctly populated
-     * @throws DuplicateGroupMemberException if group menmber already exists
+     * @throws DuplicateGroupMemberException if group member already exists
      */
     public GroupMember createGroupMember(GroupMember groupMember) throws ValidationException, DuplicateGroupMemberException {
         validateGroupMember(groupMember);

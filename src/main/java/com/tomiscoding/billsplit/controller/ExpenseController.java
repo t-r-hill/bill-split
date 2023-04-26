@@ -10,16 +10,12 @@ import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.SearchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -74,7 +70,7 @@ public class ExpenseController {
         SplitGroup splitGroup;
 
         if (groupId == 0){
-            splitGroup = expenseSearchFilter.getSplitGroups().isEmpty() ? null : expenseSearchFilter.getSplitGroups().get(0);
+            splitGroup = expenseSearchFilter.getSplitGroups().get(0);
         } else{
             splitGroup = groupService.getGroupById(groupId);
         }
