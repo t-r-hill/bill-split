@@ -27,15 +27,6 @@ public class BillSplitApplication implements CommandLineRunner {
 	@Autowired
 	AuthorityRepository authorityRepository;
 
-	@Autowired
-	MailerSendService mailerSendService;
-
-	@Autowired
-	GroupService groupService;
-
-	@Autowired
-	UserService userService;
-
 	public static void main(String[] args) {
 		SpringApplication.run(BillSplitApplication.class, args);
 	}
