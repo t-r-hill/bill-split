@@ -56,7 +56,7 @@ public class GroupMemberService {
      */
     public void removeGroupMemberAdmin(GroupMember groupMember, Long splitGroupId) throws ValidationException {
         List<GroupMember> adminGroupMembers = groupMemberRepository.getGroupMembersBySplitGroupIdAndIsAdmin(splitGroupId, true);
-        if (adminGroupMembers.size() >= 1){
+        if (adminGroupMembers.size() > 1){
             groupMember.setAdmin(false);
             updateGroupMember(groupMember);
         } else {

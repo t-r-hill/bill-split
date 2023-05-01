@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -123,10 +124,10 @@ class ExpenseServiceTest {
     void editExpenseFailure() throws ValidationException, CurrencyConversionException, ExpenseNotFoundException {
         Expense expenseSplit = expenseSplit();
         Expense expenseGood = expenseGood(Currency.GBP, "Returned expense");
-        ExpenseService mockExpenseService = mock(ExpenseService.class);
 
-        when(mockExpenseService.getExpense(any())).thenReturn(expenseSplit);
-        when(mockExpenseService.saveExpense(any())).thenReturn(expenseGood);
+        when(expenseRepository.findById(ArgumentMatchers.eq(1L))).thenReturn(Optional.ofNullable(expenseSplit));
+        when(expenseRepository.save(ArgumentMatchers.argThat(e -> e.getAmount().equals(expenseSplit.getAmount())))).thenReturn(expenseSplit);
+        when(currencyConversionService.getCurrencyConversion(Currency.USD, Currency.GBP)).thenReturn(BigDecimal.valueOf(1.2));
 
         assertThrows(ValidationException.class,
                 () -> expenseService.editExpense(expenseSplit.getId(), expenseSplit));
