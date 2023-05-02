@@ -105,7 +105,7 @@ public class GroupMemberService {
         if (groupMember.getSplitGroup() == null){
             throw new ValidationException("A group must be selected");
         } else if (groupMember.getUser() == null) {
-            throw new ValidationException("A user currency must be selected");
+            throw new ValidationException("A user must be selected");
         }
     }
 }

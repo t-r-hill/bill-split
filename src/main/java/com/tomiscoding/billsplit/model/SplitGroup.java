@@ -34,7 +34,8 @@ public class SplitGroup {
     private Currency baseCurrency;
 
     @OneToMany(mappedBy = "splitGroup", cascade = CascadeType.ALL)
-    private List<GroupMember> groupMembers;
+    @Builder.Default
+    private List<GroupMember> groupMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "splitGroup")
     @Builder.Default

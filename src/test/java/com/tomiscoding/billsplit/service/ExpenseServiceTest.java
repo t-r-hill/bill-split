@@ -23,8 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = ExpenseService.class)
 class ExpenseServiceTest {
@@ -93,8 +92,6 @@ class ExpenseServiceTest {
                 .build();
     }
 
-    List<Expense> expenses;
-
     @Test
     void saveExpenseSuccess() throws ValidationException, CurrencyConversionException {
         Expense expenseGood = expenseGood(Currency.USD,"Red wellies");
@@ -123,7 +120,6 @@ class ExpenseServiceTest {
     @Test
     void editExpenseFailure() throws ValidationException, CurrencyConversionException, ExpenseNotFoundException {
         Expense expenseSplit = expenseSplit();
-        Expense expenseGood = expenseGood(Currency.GBP, "Returned expense");
 
         when(expenseRepository.findById(ArgumentMatchers.eq(1L))).thenReturn(Optional.ofNullable(expenseSplit));
         when(expenseRepository.save(ArgumentMatchers.argThat(e -> e.getAmount().equals(expenseSplit.getAmount())))).thenReturn(expenseSplit);
@@ -137,15 +133,43 @@ class ExpenseServiceTest {
     void deleteExpenseFailure() throws ExpenseNotFoundException {
         Expense expenseSplit = expenseSplit();
 
-        when(expenseService.getExpense(any())).thenReturn(expenseSplit);
+        when(expenseRepository.findById(ArgumentMatchers.eq(1L))).thenReturn(Optional.ofNullable(expenseSplit));
+
+        assertThrows(ValidationException.class,
+                () -> expenseService.editExpense(expenseSplit.getId(), expenseSplit));
     }
 
     @Test
     void deleteExpensesListSuccess() {
-        expenses = new ArrayList<>();
+//        List<Expense> expenses = new ArrayList<>();
+//        expenses.add(expenseGood(Currency.GBP, "Red wellies"));
+//        expenses.add(expenseGood(Currency.GBP, "Blue wellies"));
+//        expenses.add(expenseGood(Currency.GBP, "Green wellies"));
+//        expenses.add(expenseSplit());
+//
+////        when(expenseRepository.deleteAllInBatch(any(ArrayList.class))).then(doNothing());
+//        //This works without mocking method but I can't test that expenses.size() == 3
+//        expenseService.deleteExpensesList(expenses);
+//        assertThat(expenses.size() == 3).isTrue();
+
     }
 
     @Test
     void setExpensesAsSplitByGroup() {
+        SplitGroup piggies = piggies();
+        List<Expense> piggyExpenses = new ArrayList<>();
+        piggyExpenses.add(expenseGood(Currency.GBP, "Red wellies"));
+        piggyExpenses.add(expenseGood(Currency.GBP, "Blue wellies"));
+        piggyExpenses.add(expenseGood(Currency.GBP, "Green wellies"));
+        piggyExpenses.add(expenseSplit());
+
+        List<Expense> unSplitExpenses = piggyExpenses.subList(0,3);
+        unSplitExpenses.forEach(e -> e.setSplit(true));
+
+//        when(expenseRepository.saveAll(ArgumentMatchers.argThat(l ->
+//                int ))).thenReturn(unSplitExpenses);
+//
+//        assertThat(expenseService.setExpensesAsSplitByGroup(piggies)).hasSize(3);
+
     }
 }
