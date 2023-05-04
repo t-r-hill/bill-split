@@ -32,8 +32,7 @@ class ExpenseServiceTest {
     @Autowired
     ExpenseService expenseService;
 
-    private User peppaPig()
-    {
+    private User peppaPig() {
         return User.builder()
                 .fullName("Peppa pig")
                 .username("peppa@pigs.com")

@@ -11,13 +11,11 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    String defaultMessage = "We couldn't complete your request, please try again. If you re-encounter this issue please contact support on tom@tomiscoding.com";
-
     @ExceptionHandler(CurrencyConversionException.class)
     @LogException
     public String handleCurrencyConversionException(CurrencyConversionException currencyConversionException, Model model){
         model.addAttribute("pageName", "Error");
-        model.addAttribute("message", defaultMessage);
+        model.addAttribute("message", "We couldn't complete your request, please try again. If you re-encounter this issue please contact support on tom@tomiscoding.com");
         model.addAttribute("detail", currencyConversionException.getMessage());
         model.addAttribute("redirectPath", "splitGroup");
         model.addAttribute("redirectText", "Return to groups");
@@ -115,7 +113,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @LogException
-    public String handleValidationException(Exception exception, Model model){
+    public String handleException(Exception exception, Model model){
         model.addAttribute("pageName", "Error");
         model.addAttribute("message", "There was a server error");
         model.addAttribute("redirectPath", "");
@@ -125,7 +123,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @LogException
-    public String handleValidationException(AccessDeniedException exception, Model model){
+    public String handleAccessDeniedException(AccessDeniedException exception, Model model){
         model.addAttribute("pageName", "Access denied");
         model.addAttribute("message", "You don't have permission to view this page");
         model.addAttribute("redirectPath", "");
