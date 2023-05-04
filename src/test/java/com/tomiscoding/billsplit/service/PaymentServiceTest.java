@@ -84,20 +84,6 @@ class PaymentServiceTest {
                 .build();
     }
 
-    private Expense expenseSplit(User user, SplitGroup splitGroup){
-        return Expense.builder()
-                .id(10L)
-                .name("Split wellies")
-                .expenseDescription("For jumping in muddy puddles")
-                .expenseDate(LocalDate.of(2023,4,20))
-                .currencyAmount(BigDecimal.valueOf(10.50))
-                .currency(Currency.GBP)
-                .isSplit(true)
-                .user(user)
-                .splitGroup(splitGroup)
-                .build();
-    }
-
     @Test
     void updatePaymentStatusToPendingSuccess() throws ValidationException {
         Payment paymentNotPaid = newPayment(PaymentStatus.NOT_PAID);
