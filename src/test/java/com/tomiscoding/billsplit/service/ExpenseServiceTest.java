@@ -4,22 +4,17 @@ import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.exceptions.ExpenseNotFoundException;
 import com.tomiscoding.billsplit.exceptions.ValidationException;
 import com.tomiscoding.billsplit.model.*;
+import com.tomiscoding.billsplit.model.Currency;
 import com.tomiscoding.billsplit.repository.ExpenseRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -141,35 +136,29 @@ class ExpenseServiceTest {
 
     @Test
     void deleteExpensesListSuccess() {
-//        List<Expense> expenses = new ArrayList<>();
-//        expenses.add(expenseGood(Currency.GBP, "Red wellies"));
-//        expenses.add(expenseGood(Currency.GBP, "Blue wellies"));
-//        expenses.add(expenseGood(Currency.GBP, "Green wellies"));
-//        expenses.add(expenseSplit());
-//
-////        when(expenseRepository.deleteAllInBatch(any(ArrayList.class))).then(doNothing());
-//        //This works without mocking method but I can't test that expenses.size() == 3
-//        expenseService.deleteExpensesList(expenses);
-//        assertThat(expenses.size() == 3).isTrue();
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(expenseGood(Currency.GBP, "Red wellies"));
+        expenses.add(expenseGood(Currency.GBP, "Blue wellies"));
+        expenses.add(expenseGood(Currency.GBP, "Green wellies"));
+        expenses.add(expenseSplit());
 
+        expenseService.deleteExpensesList(expenses);
+        verify(expenseRepository).deleteAllInBatch(argThat(it -> ((Collection<?>) it).size() == 3));
     }
 
     @Test
-    void setExpensesAsSplitByGroup() {
+    void setExpensesAsSplitByGroupSuccess() {
         SplitGroup piggies = piggies();
         List<Expense> piggyExpenses = new ArrayList<>();
         piggyExpenses.add(expenseGood(Currency.GBP, "Red wellies"));
         piggyExpenses.add(expenseGood(Currency.GBP, "Blue wellies"));
         piggyExpenses.add(expenseGood(Currency.GBP, "Green wellies"));
         piggyExpenses.add(expenseSplit());
+        piggies.setExpenses(piggyExpenses);
 
-        List<Expense> unSplitExpenses = piggyExpenses.subList(0,3);
-        unSplitExpenses.forEach(e -> e.setSplit(true));
+        expenseService.setExpensesAsSplitByGroup(piggies);
 
-//        when(expenseRepository.saveAll(ArgumentMatchers.argThat(l ->
-//                int ))).thenReturn(unSplitExpenses);
-//
-//        assertThat(expenseService.setExpensesAsSplitByGroup(piggies)).hasSize(3);
-
+        verify(expenseRepository).saveAll(argThat(it -> ((Collection<?>) it).size() == 3));
+        verify(expenseRepository).saveAll(argThat(it -> ((List<Expense>) it).get(0).isSplit()));
     }
 }

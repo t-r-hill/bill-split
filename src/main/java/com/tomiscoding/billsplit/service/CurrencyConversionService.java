@@ -1,20 +1,13 @@
 package com.tomiscoding.billsplit.service;
 
-import com.tomiscoding.billsplit.dto.CurrencyConversionResponse;
 import com.tomiscoding.billsplit.exceptions.CurrencyConversionException;
 import com.tomiscoding.billsplit.model.Currency;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
