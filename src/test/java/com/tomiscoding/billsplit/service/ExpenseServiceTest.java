@@ -92,7 +92,7 @@ class ExpenseServiceTest {
         BigDecimal USDGBPrate = BigDecimal.valueOf(1.2);
         Expense expenseGoodConverted = expenseGood(Currency.USD, "Red wellies");
         expenseGoodConverted.setCurrencyAmount(expenseGoodConverted.getCurrencyAmount().setScale(2, RoundingMode.HALF_EVEN));
-        expenseGoodConverted.setAmount(expenseGoodConverted.getCurrencyAmount().divide(USDGBPrate, 2, RoundingMode.HALF_EVEN));
+        expenseGoodConverted.setAmount(expenseGoodConverted.getCurrencyAmount().multiply(USDGBPrate).setScale(2, RoundingMode.HALF_EVEN));
 
         when(expenseRepository.save(ArgumentMatchers.argThat(e -> e.getAmount().equals(expenseGoodConverted.getAmount())))).thenReturn(expenseGoodConverted);
         when(currencyConversionService.getCurrencyConversion(Currency.USD, Currency.GBP)).thenReturn(BigDecimal.valueOf(1.2));

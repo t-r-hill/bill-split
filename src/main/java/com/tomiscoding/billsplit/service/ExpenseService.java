@@ -135,7 +135,7 @@ public class ExpenseService {
             convertedAmount = expense.getCurrencyAmount();
         } else {
             BigDecimal conversionRate = currencyConversionService.getCurrencyConversion(fromCurrency, toCurrency);
-            convertedAmount = expense.getCurrencyAmount().divide(conversionRate,2,RoundingMode.HALF_EVEN);
+            convertedAmount = expense.getCurrencyAmount().multiply(conversionRate).setScale(2, RoundingMode.HALF_EVEN);
         }
         return convertedAmount;
     }
