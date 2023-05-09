@@ -14,6 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 @EnableCaching
-public class BillSplitApplication implements CommandLineRunner {
+public class BillSplitApplication extends SpringBootServletInitializer {
 
 	@Autowired
 	AuthorityRepository authorityRepository;
@@ -31,14 +32,14 @@ public class BillSplitApplication implements CommandLineRunner {
 		SpringApplication.run(BillSplitApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-
-		Authority userRole = new Authority(Authority.Roles.ROLE_USER);
-		Authority adminRole = new Authority(Authority.Roles.ROLE_ADMIN);
-
-		if (authorityRepository.findAll().isEmpty()){
-			authorityRepository.saveAll(Arrays.asList(userRole, adminRole));
-		}
-	}
+//	@Override
+//	public void run(String... args) throws Exception {
+//
+//		Authority userRole = new Authority(Authority.Roles.ROLE_USER);
+//		Authority adminRole = new Authority(Authority.Roles.ROLE_ADMIN);
+//
+//		if (authorityRepository.findAll().isEmpty()){
+//			authorityRepository.saveAll(Arrays.asList(userRole, adminRole));
+//		}
+//	}
 }

@@ -7,7 +7,10 @@ import com.tomiscoding.billsplit.model.Expense;
 import com.tomiscoding.billsplit.model.Payment;
 import com.tomiscoding.billsplit.model.SplitGroup;
 import com.tomiscoding.billsplit.model.User;
+import com.tomiscoding.billsplit.repository.ExpenseRepository;
 import com.tomiscoding.billsplit.repository.GroupMemberRepository;
+import com.tomiscoding.billsplit.repository.GroupRepository;
+import com.tomiscoding.billsplit.repository.PaymentRepository;
 import com.tomiscoding.billsplit.service.ExpenseService;
 import com.tomiscoding.billsplit.service.GroupService;
 import com.tomiscoding.billsplit.service.PaymentService;
@@ -24,10 +27,10 @@ import java.io.Serializable;
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
 
-    private final ExpenseService expenseService;
+    private final ExpenseRepository expenseRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final GroupService groupService;
-    private final PaymentService paymentService;
+    private final GroupRepository groupRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -40,7 +43,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         if (targetType.equalsIgnoreCase("expense")){
             try {
-                Expense expense = expenseService.getExpense(Long.parseLong(targetId.toString()));
+                Expense expense = expenseRepository.findById(Long.parseLong(targetId.toString())).orElseThrow(
+                        () -> new ExpenseNotFoundException("Could not find an expense with id: " + targetId)
+                );
                 return activeUser.getId() == expense.getUser().getId() ||
                         groupMemberRepository.existsByUserIdAndSplitGroupIdAndIsAdmin(activeUser.getId(), expense.getSplitGroup().getId(), true);
             } catch (ExpenseNotFoundException e) {
@@ -48,7 +53,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             }
         } else if (targetType.equalsIgnoreCase("splitGroup")) {
             try {
-                SplitGroup splitGroup = groupService.getGroupById(Long.parseLong(targetId.toString()));
+                SplitGroup splitGroup = groupRepository.findById(Long.parseLong(targetId.toString())).orElseThrow(
+                        () -> new SplitGroupNotFoundException("Could not find group with id: " + targetId)
+                );
                 if (permission.equals("user")) {
                     return groupMemberRepository.existsByUserAndSplitGroup(activeUser, splitGroup);
                 } else if (permission.equals("admin")) {
@@ -61,7 +68,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             }
         } else if (targetType.equalsIgnoreCase("payment")){
             try {
-                Payment payment = paymentService.getPaymentById(Long.parseLong(targetId.toString()));
+                Payment payment = paymentRepository.findById(Long.parseLong(targetId.toString())).orElseThrow(
+                        () -> new PaymentNotFoundException("There is no payment with id: " + targetId)
+                );
                 if (permission.equals("PAID_PENDING")){
                     return activeUser.getId() == payment.getFromUser().getId();
                 } else if (permission.equals("PAID_CONFIRMED")) {
