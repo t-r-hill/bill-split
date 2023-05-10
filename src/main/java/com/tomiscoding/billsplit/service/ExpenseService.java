@@ -65,7 +65,7 @@ public class ExpenseService {
         expense1.setCurrencyAmount(expense.getCurrencyAmount());
         expense1.setCurrency(expense.getCurrency());
         expense1.setName(expense.getName());
-        return saveExpense(expense);
+        return saveExpense(expense1);
     }
 
     /**

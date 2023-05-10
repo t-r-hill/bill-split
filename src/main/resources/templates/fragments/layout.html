@@ -8,12 +8,13 @@
   <script type="text/javascript" th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
   <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}"/>
   <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Bill Split</title>
+  <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <th:block th:replace="fragments/header :: header"/>
 <div class="container">
   <th:block layout:fragment="content"/>
 </div>
-<th:block th:replace="fragments/footer :: footer"/>
 </body>
+<th:block th:replace="fragments/footer :: footer"/>
 </html>

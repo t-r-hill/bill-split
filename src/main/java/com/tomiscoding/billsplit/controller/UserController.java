@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -65,8 +66,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/overview")
-    public String showOverviewPage(Authentication authentication, HttpServletRequest request) {
+    @GetMapping("/loginSuccess")
+    public String showOverviewPage(Authentication authentication, HttpServletRequest request, HttpServletResponse response) throws ValidationException, SplitGroupNotFoundException {
         Cookie[] cookies = request.getCookies();
         String inviteCode = "";
         if (cookies != null){
@@ -75,16 +76,21 @@ public class UserController {
                     .min(Comparator.comparingInt(Cookie::getMaxAge))
                     .orElse(new Cookie("inviteCode", ""))
                     .getValue();
+
+            Cookie deleteCookie = new Cookie("inviteCode", inviteCode);
+            deleteCookie.setMaxAge(0);
+            deleteCookie.setPath("/");
+            response.addCookie(deleteCookie);
         }
         if (!inviteCode.isBlank()){
             User user = (User) authentication.getPrincipal();
             try {
                 groupService.addUserToGroupByInviteCode(user, inviteCode);
-            } catch (ValidationException | SplitGroupNotFoundException | DuplicateGroupMemberException e) {
-                // log exception here;
+            } catch (DuplicateGroupMemberException e) {
+                return "redirect:/splitGroup";
             }
         }
-        return "overview";
+        return "redirect:/splitGroup";
     }
 
     @GetMapping("/")

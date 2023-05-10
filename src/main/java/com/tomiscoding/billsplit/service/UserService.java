@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
 
     // Helper function to ensure password is of sufficient length
     private boolean isPasswordOk(String password){
-        return password != null && password.length() > 8;
+        return password != null && password.length() >= 8;
     }
 
     // Helper function to validate required fields on user object

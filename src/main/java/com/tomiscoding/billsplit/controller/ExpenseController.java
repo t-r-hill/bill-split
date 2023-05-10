@@ -65,7 +65,7 @@ public class ExpenseController {
         expenseSearchFilter.setUser(null);
         expenseSearchFilter.setCurrentPageNum(0);
         expenseSearchFilter.setNumPages(1);
-        expenseSearchFilter.setIsSplit(true);
+        expenseSearchFilter.setIsSplit(false);
 
         SplitGroup splitGroup;
 

@@ -22,7 +22,7 @@ public class SecurityConfig{
                         .anyRequest().hasAuthority("ROLE_USER"))
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .defaultSuccessUrl("/splitGroup")
+                        .defaultSuccessUrl("/loginSuccess")
                         .failureUrl("/login?error=true")
                         .permitAll());
         return http.build();

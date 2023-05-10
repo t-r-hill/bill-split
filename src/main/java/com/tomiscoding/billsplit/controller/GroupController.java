@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class GroupController {
 
     private final GroupService groupService;
-    private final UserService userService;
     private final PaymentService paymentService;
     private final GroupMemberService groupMemberService;
     private final MailerSendService mailerSendService;
@@ -116,7 +115,7 @@ public class GroupController {
         cookie.setMaxAge(600);
         cookie.setPath("/");
         response.addCookie(cookie);
-        return "redirect:/overview";
+        return "redirect:/loginSuccess";
     }
 
     @GetMapping("/join")
@@ -125,14 +124,10 @@ public class GroupController {
     }
 
     @PostMapping("/join")
-    public String addUserToGroup(@RequestParam String inviteCode, Authentication authentication){
+    public String addUserToGroup(@RequestParam String inviteCode, Authentication authentication) throws ValidationException, SplitGroupNotFoundException, DuplicateGroupMemberException {
         if (!inviteCode.isBlank()){
             User user = (User) authentication.getPrincipal();
-            try {
-                groupService.addUserToGroupByInviteCode(user, inviteCode);
-            } catch (ValidationException | SplitGroupNotFoundException | DuplicateGroupMemberException e) {
-                // log exception here;
-            }
+            groupService.addUserToGroupByInviteCode(user, inviteCode);
         }
         return "redirect:/splitGroup";
     }
