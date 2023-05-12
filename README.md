@@ -1,7 +1,7 @@
 # Bill Split
 
 Bill split is a java web application to allow groups of people to easily track and split 
-expenses between the members of the group
+shared expenses between the members of the group
 
 ## Dependencies
 
